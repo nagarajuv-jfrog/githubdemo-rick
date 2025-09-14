@@ -1,0 +1,150 @@
+components:
+  schemas:
+    models.ComponentVersions:
+      properties:
+        version:
+          type: string
+      type: object
+    models.ComponentsByVersionModel:
+      properties:
+        build_repo:
+          type: string
+        pkg_name:
+          type: string
+        pkg_type:
+          type: string
+        versions:
+          items:
+            $ref: '#/components/schemas/models.ComponentVersions'
+          type: array
+          uniqueItems: false
+      type: object
+    models.CvesSearchByComponentResponse:
+      properties:
+        component:
+          description: The component ID
+          example: gav://commons-collections:commons-collections:3.2.1
+          type: string
+        cves:
+          description: An array of CVEs associated with the component
+          example:
+            - CVE-2024-12085
+            - CVE-2024-12086
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        error:
+          description: Error message if component retrieval fails
+          type: string
+      type: object
+    models.CvesSearchModel:
+      properties:
+        components_id:
+          description: An array of component IDs to search for CVEs
+          example:
+            - gav://commons-collections:commons-collections:3.2.1
+            - c2
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+      type: object
+    routes.ErrorFeedBackMessage:
+      properties:
+        error:
+          type: string
+      type: object
+  securitySchemes:
+    basic:
+      scheme: basic
+      type: http
+    tokenAuth:
+      in: header
+      name: Authorization
+      type: apiKey
+externalDocs:
+  description: ''
+  url: ''
+info:
+  description: This is the Swagger documentation for the Xray API.
+  title: Xray Swagger API
+  version: '1.0'
+openapi: 3.1.0
+paths:
+  /items:
+    get:
+      summary: Get mixed items
+      responses:
+        '200':
+          description: Array of varied objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: >-
+                        #/components/schemas/models.CvesSearchByComponentResponse
+                    - $ref: >-
+                        #/components/schemas/models.CvesSearchByComponentResponse
+              examples:
+                example1:
+                  summary: A sample with type A and B
+                  value:
+                    - type: A
+                      name: Alpha
+                    - type: B
+                      count: 42
+                example2:
+                  summary: A sample with only type A
+                  value:
+                    - type: A
+                      name: Beta
+                    - type: A
+                      name: Gamma
+  /api/v1/component/searchCvesByComponentsUrl:
+    post:
+      description: Search for CVEs by the infected components
+      operationId: post_searchCvesByComponentsUrl
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/models.CvesSearchModel'
+        description: search Cves  payload
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - items:
+                      $ref: >-
+                        #/components/schemas/models.CvesSearchByComponentResponse
+                    type: array
+                  - items:
+                      $ref: '#/components/schemas/models.ComponentsByVersionModel'
+                    type: array
+          description: Response body
+        '415':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/routes.ErrorFeedBackMessage'
+          description: Failed to parse request
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/routes.ErrorFeedBackMessage'
+          description: Failed to search cves of components
+      security:
+        - authToken: []
+          basic: []
+      summary: Find CVEs by Component
+      tags:
+        - components
+servers:
+  - url: /xray
