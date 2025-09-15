@@ -2,10 +2,12 @@
 title: JFrog Platform Overview
 deprecated: false
 hidden: false
+link:
+  new_tab: false
 metadata:
   robots: index
 ---
-Welcome to the JFrog Platform, providing a seamless and unified DevOps experience across all JFrog products. The JFrog Platform unifies the user experience and management of all the JFrog services into a single pane of glass
+The JFrog Platform delivers a unified and seamless DevOps experience across all JFrog products. It integrates the entire suite of JFrog services into a single, intuitive pane of glass, streamlining your development and release cycles.
 
 ![](https://files.readme.io/1bb41578a6216ec5285650e2a6e1e8ad0c9be567cebbe06947fb9a5b24069735-image.png)
 
