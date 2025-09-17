@@ -7,7 +7,7 @@ link:
 metadata:
   robots: index
 ---
-The JFrog Platform delivers a unified and seamless DevOps experience across all JFrog products. It integrates the entire suite of JFrog services into a single, intuitive pane of glass, streamlining your development and release cycles.
+La Plataforma JFrog ofrece una experiencia DevOps unificada y sin interrupciones en todos los productos JFrog. Integra toda la suite de servicios de JFrog en un único e intuitivo panel de control, agilizando sus ciclos de desarrollo y lanzamiento.
 
 ![](https://files.readme.io/1bb41578a6216ec5285650e2a6e1e8ad0c9be567cebbe06947fb9a5b24069735-image.png)
 
