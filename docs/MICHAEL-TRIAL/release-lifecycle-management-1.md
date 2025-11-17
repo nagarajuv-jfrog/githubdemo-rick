@@ -36,4 +36,4 @@ This is another attempt to put text under the image, not to its side.
 
 This is a test block under the image.
 
-<Image align="center" border={false} width="80% " src="https://files.readme.io/8762d1d6ad15e0ce97a2cd3298cd9f7f345c51677e270747a82c51393842286d-SL_global-page.png" />
+<Image align="left" border={false} width="80% " src="https://files.readme.io/8762d1d6ad15e0ce97a2cd3298cd9f7f345c51677e270747a82c51393842286d-SL_global-page.png" />
