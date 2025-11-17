@@ -7,8 +7,6 @@ metadata:
 ---
 <br />
 
-# Shell Auto-Completion
-
 ## Overview
 
 JFrog CLI supports shell auto-completion for bash, zsh, and fish shells. Auto-completion helps save time and reduces errors by suggesting potential command options and arguments as you type.
