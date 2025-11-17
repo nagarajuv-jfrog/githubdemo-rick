@@ -23,8 +23,8 @@ You can configure your pub package management client to work with Artifactory, a
    ```
    Where:
    * `<JFrogPlatformURL>`: The URL of your JPD
-   * `<REPO_NAME>`: The name of the target repository in Artifactory  
-   For example:  
+   * `<REPO_NAME>`: The name of the target repository in Artifactory    
+   For example:
    ```shell Dart
    dart pub token add "https://company.jfrog.io/artifactory/api/pub/pub-local"
    ```
@@ -32,19 +32,19 @@ You can configure your pub package management client to work with Artifactory, a
    flutter pub token add "https://company.jfrog.io/artifactory/api/pub/pub-local"
    ```
 2. When prompted, enter your Artifactory identity token.
-3. Set the environment variable:    
+3. Set the environment variable:
    ```shell
    export PUB_HOSTED_URL="https://[JFrogPlatformURL]/artifactory/api/pub/<REPO_NAME>"
    ```
-   Where:  
+   Where:
    * `<JFrogPlatformURL>`: The URL of your JPD
-   * `<REPO_NAME>`: The name of the target repository in Artifactory     
-   For example:  
+   * `<REPO_NAME>`: The name of the target repository in Artifactory    
+   For example:
    ```shell
    export PUB_HOSTED_URL="https://company.jfrog.io/artifactory/api/pub/pub-local"
    ```
 
-<Callout icon="✏️">
+<Callout icon="✏️" theme="default">
   You can also use JFrog Set Me Up to copy the snippets populated with your token and environment. For more information, see <Anchor label="Use Artifactory Set Me Up for Configuring Package Manager Clients" target="_blank" href="https://jfrog.com/help/r/TFrtp_Jcpcw1vmlHZ63Gmw/ZQkZO1M6w04xNachSD4qrw">Use Artifactory Set Me Up for Configuring Package Manager Clients</Anchor>.
 </Callout>
 
