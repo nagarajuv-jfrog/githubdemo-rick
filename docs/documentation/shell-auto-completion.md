@@ -7,84 +7,264 @@ metadata:
 ---
 <br />
 
-## Overview
+## jf completion
 
-JFrog CLI supports shell auto-completion for bash, zsh, and fish shells. Auto-completion helps save time and reduces errors by suggesting potential command options and arguments as you type.
+Generate shell completion scripts for JFrog CLI commands.
 
-### Benefits
+### Synopsis
 
-* **Increase Efficiency**: Quickly fill in commands and arguments without typing them out fully
-* **Reduce Errors**: Minimize typographical errors in commands and options
-* **Discover Commands**: Easily explore options for specific commands with in-line suggestions
+The completion command generates shell completion scripts for bash, zsh, and fish. Shell completion enables interactive command-line completion of JFrog CLI commands, subcommands, and flags using the Tab key.
 
-## Installation
+To load completions in your current shell session, follow the instructions provided for your shell after running the completion command.
 
-The method of enabling auto-completion varies based on the shell you are using.
+### Usage
 
-### Installation via Homebrew
+```
+jf completion [shell] [flags]
+```
 
-If you're installing JFrog CLI using Homebrew, the bash, zsh, or fish auto-complete scripts are automatically installed. However, you need to ensure that your `.bash_profile` or `.zshrc` files are correctly configured.
+### Available Shells
 
-Refer to the [Homebrew Shell Completion documentation](https://docs.brew.sh/Shell-Completion) for specific instructions.
+* `bash`
+* `zsh`
+* `fish`
 
-### Oh My Zsh Framework
+### Flags
 
-If you are using the Oh My Zsh framework, follow these steps to enable JFrog CLI auto-completion:
+```
+--install    Install the completion script automatically
+```
 
-1. Open your zsh configuration file, located at `$HOME/.zshrc`, with any text editor
+### Examples
 
-2. Locate the line starting with `plugins=`
+**Generate bash completion script:**
 
-3. Add `jfrog` to the list of plugins. For example:
+```bash
+jf completion bash
+```
 
-   ```bash
-   plugins=(git mvn npm sdk jfrog)
-   ```
-
-4. Save and close the file
-
-5. Restart your terminal or run `source ~/.zshrc`
-
-### Manual Installation
-
-If you're not using Homebrew or Oh My Zsh, you can manually install the auto-completion scripts for your specific shell.
-
-#### bash
-
-Run the following command to install bash completion:
+**Install bash completion automatically:**
 
 ```bash
 jf completion bash --install
 ```
 
-Follow the on-screen instructions to complete the installation.
+**Generate zsh completion script:**
 
-#### zsh
+```bash
+jf completion zsh
+```
 
-Run the following command to install zsh completion:
+**Install zsh completion automatically:**
 
 ```bash
 jf completion zsh --install
 ```
 
-Follow the on-screen instructions to complete the installation.
+**Generate fish completion script:**
 
-#### fish
+```bash
+jf completion fish
+```
 
-Run the following command to install fish completion:
+**Install fish completion automatically:**
 
 ```bash
 jf completion fish --install
 ```
 
-Again, follow the instructions provided during the installation process.
+***
+
+## Setup Instructions
+
+### Prerequisites
+
+Shell completion requires your shell's completion system to be configured. Most package managers handle this automatically.
+
+### bash
+
+**macOS (using Homebrew):**
+
+```bash
+brew install bash-completion@2
+```
+
+Add the following to your `~/.bash_profile`:
+
+```bash
+export BASH_COMPLETION_COMPAT_DIR="/usr/local/etc/bash_completion.d"
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+```
+
+**Linux:**
+
+Most Linux distributions have bash-completion pre-installed. If not:
+
+```bash
+# Debian/Ubuntu
+sudo apt-get install bash-completion
+
+# RHEL/CentOS/Fedora
+sudo yum install bash-completion
+```
+
+**Install JFrog CLI completion:**
+
+```bash
+jf completion bash --install
+```
+
+Alternatively, generate the script manually:
+
+```bash
+jf completion bash > /usr/local/etc/bash_completion.d/jf
+```
+
+Reload your shell:
+
+```bash
+source ~/.bash_profile  # macOS
+source ~/.bashrc        # Linux
+```
+
+### zsh
+
+**Standard zsh:**
+
+Install completion:
+
+```bash
+jf completion zsh --install
+```
+
+Follow the on-screen instructions to add the completion script location to your `fpath`.
+
+Alternatively, generate the script manually:
+
+```bash
+# Create completion directory if needed
+mkdir -p ~/.zsh/completion
+
+# Generate completion script
+jf completion zsh > ~/.zsh/completion/_jf
+```
+
+Add to your `~/.zshrc`:
+
+```bash
+fpath=(~/.zsh/completion $fpath)
+autoload -Uz compinit && compinit
+```
+
+Reload your shell:
+
+```bash
+source ~/.zshrc
+```
+
+**Oh My Zsh:**
+
+If using Oh My Zsh, add `jfrog` to the plugins array in `~/.zshrc`:
+
+```bash
+plugins=(
+  git
+  docker
+  kubectl
+  jfrog
+)
+```
+
+Reload your shell:
+
+```bash
+source ~/.zshrc
+```
+
+**Homebrew (automatic):**
+
+When installing via Homebrew, completions are installed automatically:
+
+```bash
+brew install jfrog-cli
+```
+
+Ensure Homebrew completions are enabled in `~/.zshrc`:
+
+```bash
+if type brew &>/dev/null; then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+  autoload -Uz compinit && compinit
+fi
+```
+
+### fish
+
+**Install completion:**
+
+```bash
+jf completion fish --install
+```
+
+Alternatively, generate the script manually:
+
+```bash
+jf completion fish > ~/.config/fish/completions/jf.fish
+```
+
+Completions will be available in new shell sessions.
+
+***
 
 ## Verification
 
-After installation, restart your terminal or source your shell configuration file to activate auto-completion. You can then test it by typing `jf` or `jfrog` followed by a space and pressing the Tab key to see available commands and options.
+After installation, test the completion:
 
-## Related Topics
+1. Open a new terminal session
+2. Type `jf ` and press `Tab`
+3. You should see available commands
+4. Type `jf config ` and press `Tab` to see subcommands
 
-* [JFrog CLI Installation](https://jfrog.com/help/r/jfrog-applications-and-cli-documentation/install)
-* [JFrog CLI Environment Variables](https://jfrog.com/help/r/jfrog-applications-and-cli-documentation/jfrog-cli-environment-variables)
-* [JFrog CLI Configuration](https://jfrog.com/help/r/jfrog-applications-and-cli-documentation/configurations)
+Example output:
+
+```
+$ jf <Tab>
+add          completion   pip          use
+build        config       rt           version
+c            docker       scan         ...
+```
+
+***
+
+## Troubleshooting
+
+**Completions not working:**
+
+1. Ensure the completion script is in the correct location
+2. Verify your shell configuration file loads the completion system
+3. Restart your terminal or source your configuration file
+4. Check that the JFrog CLI binary is in your `$PATH`
+
+**Permission errors during installation:**
+
+If you encounter permission errors, you may need to run the command with `sudo` or adjust file permissions:
+
+```bash
+sudo jf completion bash --install
+```
+
+**Oh My Zsh plugin not found:**
+
+Ensure you have the latest version of Oh My Zsh and that the JFrog CLI is installed via Homebrew or the plugin is available in your Oh My Zsh installation.
+
+***
+
+## See Also
+
+* [jf config](./config.md) - Configure JFrog CLI settings
+* [jf --help](./help.md) - Get help for any command
+* [Environment Variables](./environment-variables.md) - Configure CLI behavior with environment variables
+
+***
+
+<br />
