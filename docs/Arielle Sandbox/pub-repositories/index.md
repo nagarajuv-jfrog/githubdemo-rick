@@ -8,6 +8,11 @@ deprecated: false
 hidden: false
 metadata:
   robots: index
+next:
+  pages:
+    - slug: get-started-with-pub
+      title: Get Started with pub
+      type: basic
 ---
 pub repositories in Artifactory support the Dart programming language. Dart contains reusable libraries and packages for Flutter, Angular Dart, and general Dart programs. The pub package manager downloads dependencies, compiles your packages, makes distributable packages, and uploads them to the official Dart and Flutter package registry at [pub.dev](https://pub.dev/). For more information, see [Dart documentation](https://dart.dev/docs) and information about the [pub package manager](https://dart.dev/tools/pub/packages).
 
