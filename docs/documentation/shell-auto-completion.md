@@ -89,6 +89,12 @@ Shell completion requires your shell's completion system to be configured. Most 
 brew install bash-completion@2
 ```
 
+```markdown
+brew install bash-completion@2 sbsdbs
+```
+
+<br />
+
 Add the following to your `~/.bash_profile`:
 
 ```bash
