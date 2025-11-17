@@ -2,4 +2,3 @@
 - deploy-pub-packages
 - copy-of-deploy-pub-packages
 - pub-repositories
-- connect-pub-client-to-artifactory
