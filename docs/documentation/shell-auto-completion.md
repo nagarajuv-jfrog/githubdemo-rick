@@ -7,81 +7,86 @@ metadata:
 ---
 <br />
 
-If you're using JFrog CLI from a bash, zsh, or fish shell, you can install JFrog CLI's auto-completion scripts to improve your command-line experience. Auto-completion helps save time and reduces errors by suggesting potential command options and arguments as you type.
+# Shell Auto-Completion
 
-Auto-completion allows you to:
+## Overview
 
-Increase Efficiency: Quickly fill in commands and arguments without typing them out fully.
+JFrog CLI supports shell auto-completion for bash, zsh, and fish shells. Auto-completion helps save time and reduces errors by suggesting potential command options and arguments as you type.
 
-Reduce Errors: Minimize typographical errors in commands and options.
+### Benefits
 
-Discover Commands: Easily explore options for specific commands with in-line suggestions.
+* **Increase Efficiency**: Quickly fill in commands and arguments without typing them out fully
+* **Reduce Errors**: Minimize typographical errors in commands and options
+* **Discover Commands**: Easily explore options for specific commands with in-line suggestions
 
-What is JFrog CLI? : JFrog CLI is a command-line interface for interacting with JFrog Artifactory and other JFrog products. It simplifies various functions, such as uploading or downloading files, managing repositories, and more. For more information, refer to the JFrog CLI.
+## Installation
 
-How to Enable Auto-Completion?: The method of enabling auto-completion varies based on the shell you are using (bash, zsh, or fish).
+The method of enabling auto-completion varies based on the shell you are using.
 
-Install JFrog CLI with Homebrew: If you're installing JFrog CLI using Homebrew, the bash, zsh, or fish auto-complete scripts are automatically installed. However, you need to ensure that your
-.bash_profile
-or
-.zshrc
-files are correctly configured. Refer to the Homebrew Shell Completion documentation for specific instructions.
+### Installation via Homebrew
 
-Using Oh My Zsh?
+If you're installing JFrog CLI using Homebrew, the bash, zsh, or fish auto-complete scripts are automatically installed. However, you need to ensure that your `.bash_profile` or `.zshrc` files are correctly configured.
+
+Refer to the [Homebrew Shell Completion documentation](https://docs.brew.sh/Shell-Completion) for specific instructions.
+
+### Oh My Zsh Framework
+
 If you are using the Oh My Zsh framework, follow these steps to enable JFrog CLI auto-completion:
 
-Open your zsh configuration file, located at
-$HOME/.zshrc
-, with any text editor."
+1. Open your zsh configuration file, located at `$HOME/.zshrc`, with any text editor
 
-your-text-editor $HOME/.zshrc
+2. Locate the line starting with `plugins=`
 
-Locate the line starting with
-plugins=
-.
+3. Add `jfrog` to the list of plugins. For example:
 
-Add
-jfrog
-to the list of plugins. For example:
+   ```bash
+   plugins=(git mvn npm sdk jfrog)
+   ```
 
-plugins=(git mvn npm sdk jfrog)
+4. Save and close the file
 
-Save and close the file.
+5. Restart your terminal or run `source ~/.zshrc`
 
-Finally, apply the changes by running:
+### Manual Installation
 
-source $HOME/.zshrc
+If you're not using Homebrew or Oh My Zsh, you can manually install the auto-completion scripts for your specific shell.
 
-Other Installation Methods
-If you're not using Homebrew or Oh My Zsh, you can manually install the auto-completion scripts for your specific shell:
+#### bash
 
-For Bash
+Run the following command to install bash completion:
 
-To install auto-completion for bash, run the following command:
-
+```bash
 jf completion bash --install
-⧉
+```
+
 Follow the on-screen instructions to complete the installation.
 
-For Zsh
+#### zsh
 
-To install auto-completion for zsh, run the following command:
+Run the following command to install zsh completion:
 
+```bash
 jf completion zsh --install
-⧉
+```
+
+Follow the on-screen instructions to complete the installation.
+
+#### fish
+
+Run the following command to install fish completion:
+
+```bash
+jf completion fish --install
+```
+
 Again, follow the instructions provided during the installation process.
 
-For Fish
+## Verification
 
-To install auto-completion for fish, run the following command:
+After installation, restart your terminal or source your shell configuration file to activate auto-completion. You can then test it by typing `jf` or `jfrog` followed by a space and pressing the Tab key to see available commands and options.
 
-jf completion fish --install
-⧉
-Ensure you follow the relevant instructions to finalize the setup.
+## Related Topics
 
-Verifying Installation
-After installing the completion scripts, you can verify that auto-completion works by typing
-jf
-followed by pressing the
-Tab
-key. You should see a list of available commands and options.
+* [JFrog CLI Installation](https://jfrog.com/help/r/jfrog-applications-and-cli-documentation/install)
+* [JFrog CLI Environment Variables](https://jfrog.com/help/r/jfrog-applications-and-cli-documentation/jfrog-cli-environment-variables)
+* [JFrog CLI Configuration](https://jfrog.com/help/r/jfrog-applications-and-cli-documentation/configurations)
