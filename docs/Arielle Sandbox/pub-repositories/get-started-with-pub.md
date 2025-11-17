@@ -1,5 +1,8 @@
 ---
 title: Get Started with pub
+excerpt: >-
+  Use this information as a quick guide to configure pub repositories in
+  Artifactory and use your pub client to natively manage packages in the CLI. 
 deprecated: false
 hidden: false
 metadata:
