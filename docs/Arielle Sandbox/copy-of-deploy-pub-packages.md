@@ -13,6 +13,12 @@ This procedure assumes that your package manager client is connected to Artifact
 # To resolve pub packages from Artifactory:
 
 1. Update the version number in your `pubspec.yaml` file.
-2. Run the following command from the project root folder:
+2. Run the following command from the project root folder:  
+   ```shell Dart
+   dart pub get
+   ```
+   ```shell Flutter
+   flutter pub get
+   ```
 
 <br />
