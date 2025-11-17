@@ -21,3 +21,7 @@ JFrog’s Release Lifecycle Management solution centers around controlling the f
 <Image align="left" border={false} width="60% " src="https://files.readme.io/c2ffdb0362a500ac27098dca739d659eb2a5ec21794e3d47f1df367b85539bc7-add-query_wizard.png" />
 
 <br />
+
+<br />
+
+<br />
