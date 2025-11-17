@@ -1,5 +1,5 @@
 - this-is-a-topic
-- connect-pub-client-to-artifactory
 - deploy-pub-packages
 - copy-of-deploy-pub-packages
 - pub-repositories
+- connect-pub-client-to-artifactory
