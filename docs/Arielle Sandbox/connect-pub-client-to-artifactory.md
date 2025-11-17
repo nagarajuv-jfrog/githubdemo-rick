@@ -12,6 +12,9 @@ next:
     - slug: deploy-pub-packages
       title: Deploy pub Packages
       type: basic
+    - slug: copy-of-deploy-pub-packages
+      title: Resolve pub Packages
+      type: basic
 ---
 You can configure your pub package management client to work with Artifactory, allowing you to natively manage pub packages in Artifactory using the CLI of your choice. Supported clients are Dart CLI and Flutter CLI.
 
