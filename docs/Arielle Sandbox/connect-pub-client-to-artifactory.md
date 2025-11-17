@@ -10,9 +10,11 @@ metadata:
 ---
 You can configure your pub package management client to work with Artifactory, allowing you to natively manage pub packages in Artifactory using the CLI of your choice. Supported clients are Dart CLI and Flutter CLI.
 
-**Prerequisites**: Before connecting the Dart CLI to Artifactory, you must have an existing pub repository in Artifactory. For more information, see [Create a pub Repository](https://jfrog.com/help/r/TFrtp_Jcpcw1vmlHZ63Gmw/LaRMFN80t9Am0iMgoM88hw).
+# Prerequisites
 
-**To connect your pub package manager to Artifactory:**
+Before connecting the Dart CLI to Artifactory, you must have an existing pub repository in Artifactory. For more information, see [Create a pub Repository](https://jfrog.com/help/r/TFrtp_Jcpcw1vmlHZ63Gmw/LaRMFN80t9Am0iMgoM88hw).
+
+# To connect your pub package manager to Artifactory
 
 1. Run this command to add the Artifactory repository to your client:
    ```shell Dart
@@ -23,8 +25,8 @@ You can configure your pub package management client to work with Artifactory, a
    ```
    Where:
    * `<JFrogPlatformURL>`: The URL of your JPD
-   * `<REPO_NAME>`: The name of the target repository in Artifactory    
-   For example:
+   * `<REPO_NAME>`: The name of the target repository in Artifactory  
+     For example:
    ```shell Dart
    dart pub token add "https://company.jfrog.io/artifactory/api/pub/pub-local"
    ```
@@ -38,8 +40,8 @@ You can configure your pub package management client to work with Artifactory, a
    ```
    Where:
    * `<JFrogPlatformURL>`: The URL of your JPD
-   * `<REPO_NAME>`: The name of the target repository in Artifactory    
-   For example:
+   * `<REPO_NAME>`: The name of the target repository in Artifactory  
+     For example:
    ```shell
    export PUB_HOSTED_URL="https://company.jfrog.io/artifactory/api/pub/pub-local"
    ```
