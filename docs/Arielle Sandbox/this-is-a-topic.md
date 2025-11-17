@@ -13,15 +13,17 @@ metadata:
 <ArielleReuseTest />
 
 <Tabs>
-  <Tab title="First Tab">
-    Welcome to the content that you can only see inside the first Tab.
+  <Tab title="npm CLI">
+    Welcome to the content that you can only see inside the first Tab. Can we put ordered lists in here?
+    1. This is a test.
+    2. What about a second step?
+		3. What about code formatting, idk how to do that here
+		<code>flkerjjr</code>
+		4. Last step
+
   </Tab>
 
-  <Tab title="Second Tab">
+  <Tab title="Yarn">
     Here's content that's only inside the second Tab.
-  </Tab>
-
-  <Tab title="Third Tab">
-    Here's content that's only inside the third Tab.
   </Tab>
 </Tabs>
