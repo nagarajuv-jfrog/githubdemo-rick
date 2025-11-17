@@ -15,12 +15,12 @@ metadata:
 <Tabs>
   <Tab title="npm CLI">
     Welcome to the content that you can only see inside the first Tab. Can we put ordered lists in here?
+
     1. This is a test.
     2. What about a second step?
-		3. What about code formatting, idk how to do that here
-		<code>flkerjjr</code>
-		4. Last step
-
+    3. What about code formatting, idk how to do that here
+       <code>flkerjjr</code>
+    4. Last step
   </Tab>
 
   <Tab title="Yarn">
