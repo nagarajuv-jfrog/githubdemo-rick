@@ -15,10 +15,10 @@ You can configure your pub package management client to work with Artifactory, a
 **To connect your pub package manager to Artifactory:**
 
 1. Run this command to add the Artifactory repository to your client:
-   ```Text Dart
+   ```shell Dart
    dart pub token add "https://[JFrogPlatformURL]/artifactory/api/pub/<REPO_NAME>"
    ```
-   ```Text Flutter
+   ```shell Flutter
    flutter token add "https://[JFrogPlatformURL]/artifactory/api/pub/<REPO_NAME>"
    ```
    Where:
@@ -43,5 +43,9 @@ You can configure your pub package management client to work with Artifactory, a
    ```shell
    export PUB_HOSTED_URL="https://company.jfrog.io/artifactory/api/pub/pub-local"
    ```
+
+<Callout icon="✏️">
+  You can also use JFrog Set Me Up to copy the snippets populated with your token and environment. For more information, see <Anchor label="Use Artifactory Set Me Up for Configuring Package Manager Clients" target="_blank" href="https://jfrog.com/help/r/TFrtp_Jcpcw1vmlHZ63Gmw/ZQkZO1M6w04xNachSD4qrw">Use Artifactory Set Me Up for Configuring Package Manager Clients</Anchor>.
+</Callout>
 
 <br />
