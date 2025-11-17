@@ -32,4 +32,8 @@ JFrog’s Release Lifecycle Management solution centers around controlling the f
 
 <br />
 
+This is another attempt to put text under the image, not to its side.
+
 This is a test block under the image.
+
+<br />
