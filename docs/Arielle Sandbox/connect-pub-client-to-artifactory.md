@@ -14,17 +14,34 @@ You can configure your pub package management client to work with Artifactory, a
 
 **To connect your pub package manager to Artifactory:**
 
-1. Run this command to add the Artifactory repository to your client: 
+1. Run this command to add the Artifactory repository to your client:
    ```Text Dart
    dart pub token add "https://[JFrogPlatformURL]/artifactory/api/pub/<REPO_NAME>"
    ```
    ```Text Flutter
    flutter token add "https://[JFrogPlatformURL]/artifactory/api/pub/<REPO_NAME>"
    ```
+   Where:
+   * `<JFrogPlatformURL>`: The URL of your JPD
+   * `<REPO_NAME>`: The name of the target repository in Artifactory  
+   For example:  
+   ```shell Dart
+   dart pub token add "https://company.jfrog.io/artifactory/api/pub/pub-local"
+   ```
+   ```shell Flutter
+   flutter pub token add "https://company.jfrog.io/artifactory/api/pub/pub-local"
+   ```
+2. When prompted, enter your Artifactory identity token.
+3. Set the environment variable:    
+   ```shell
+   export PUB_HOSTED_URL="https://[JFrogPlatformURL]/artifactory/api/pub/<REPO_NAME>"
+   ```
    Where:  
-   * ```
-     ```
-     <br />
-2. <br />
-3. Test
-4. Test
+   * `<JFrogPlatformURL>`: The URL of your JPD
+   * `<REPO_NAME>`: The name of the target repository in Artifactory     
+   For example:  
+   ```shell
+   export PUB_HOSTED_URL="https://company.jfrog.io/artifactory/api/pub/pub-local"
+   ```
+
+<br />
