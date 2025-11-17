@@ -18,11 +18,13 @@ next:
 ---
 You can configure your pub package management client to work with Artifactory, allowing you to natively manage pub packages in Artifactory using the CLI of your choice. Supported clients are Dart CLI and Flutter CLI.
 
+To get up and running quickly with pub repos in Artifactory, see <Anchor label="Get Started with pub" target="_blank" href="https://jfrog.com/help/r/TFrtp_Jcpcw1vmlHZ63Gmw/t22zRWqMC_6DsaDaO~sDsQ">Get Started with pub</Anchor>.
+
 # Prerequisites
 
 Before connecting the Dart CLI to Artifactory, you must have an existing pub repository in Artifactory. For more information, see [Create a pub Repository](https://jfrog.com/help/r/TFrtp_Jcpcw1vmlHZ63Gmw/LaRMFN80t9Am0iMgoM88hw).
 
-# To connect your pub package manager to Artifactory
+# To connect your pub package manager to Artifactory:
 
 1. Run this command to add the Artifactory repository to your client:
    ```shell Dart
