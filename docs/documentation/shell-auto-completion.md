@@ -11,12 +11,15 @@ metadata:
 
 Generate shell completion scripts for JFrog CLI commands.
 
+<br />
+
 <Tabs>
   <Tab title="First Tab">
     Trust can be created between multiple services: you need to make sure that all participating instances in the circle of trust are equipped with the relevant public keys (root certificate). Note that a trust can be unidirectional or bidirectional. The service watches a directory of trusted public keys and reloads the keys when it needs to verify a token
   </Tab>
 
   <Tab title="Second Tab">
+
     | ID  | Name       | Status    | Score | Notes                     |
     | --- | ---------- | --------- | ----- | ------------------------- |
     | 101 | Alpha Wolf | Active    | 89    | Passed initial screening  |
@@ -28,7 +31,7 @@ Generate shell completion scripts for JFrog CLI commands.
 
   <Tab title="Third Tab">
     ```
-def calculate_metrics(values):
+    def calculate_metrics(values):
     total = sum(values)
     avg = total / len(values)
     return {
@@ -38,14 +41,12 @@ def calculate_metrics(values):
         "min": min(values)
     }
 
-data = [12, 45, 3, 67, 23]
-result = calculate_metrics(data)
+    data = [12, 45, 3, 67, 23]
+    result = calculate_metrics(data)
 
-print("Metrics:", result)
+    print("Metrics:", result)
 
-```
-
-
+    ```
   </Tab>
 </Tabs>
 
