@@ -17,7 +17,14 @@ Generate shell completion scripts for JFrog CLI commands.
   </Tab>
 
   <Tab title="Second Tab">
-    Here's content that's only inside the second Tab.
+    | ID  | Name        | Status     | Score | Notes                     |
+|-----|-------------|------------|-------|----------------------------|
+| 101 | Alpha Wolf  | Active     | 89    | Passed initial screening  |
+| 102 | Beta Hawk   | Inactive   | 72    | Needs follow-up review    |
+| 103 | Delta Fox   | Pending    | 94    | High potential candidate  |
+| 104 | Sigma Bear  | Active     | 63    | Requires performance plan |
+| 105 | Omega Lynx  | Suspended  | 47    | Policy violation flagged  |
+
   </Tab>
 
   <Tab title="Third Tab">
