@@ -11,6 +11,20 @@ metadata:
 
 Generate shell completion scripts for JFrog CLI commands.
 
+<Tabs>
+  <Tab title="First Tab">
+    Trust can be created between multiple services: you need to make sure that all participating instances in the circle of trust are equipped with the relevant public keys (root certificate). Note that a trust can be unidirectional or bidirectional. The service watches a directory of trusted public keys and reloads the keys when it needs to verify a token
+  </Tab>
+
+  <Tab title="Second Tab">
+    Here's content that's only inside the second Tab.
+  </Tab>
+
+  <Tab title="Third Tab">
+    Here's content that's only inside the third Tab.
+  </Tab>
+</Tabs>
+
 ### Synopsis
 
 The completion command generates shell completion scripts for bash, zsh, and fish. Shell completion enables interactive command-line completion of JFrog CLI commands, subcommands, and flags using the Tab key.
