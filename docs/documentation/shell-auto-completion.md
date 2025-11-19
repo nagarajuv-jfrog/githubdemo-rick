@@ -1,13 +1,16 @@
 ---
 title: Shell Auto Completion
+excerpt: >-
+  Generate shell completion scripts for JFrog CLI commands, including bash, zsh,
+  and fish.
 deprecated: false
 hidden: false
+link:
+  new_tab: false
 metadata:
   robots: index
 ---
-<br />
-
-## jf completion
+## JFrog Completion
 
 Generate shell completion scripts for JFrog CLI commands.
 
@@ -59,7 +62,7 @@ To load completions in your current shell session, follow the instructions provi
 ### Usage
 
 ```
-jf completion [shell] [flags]
+jfrog completion [shell] [flags]
 ```
 
 ### Available Shells
@@ -79,37 +82,37 @@ jf completion [shell] [flags]
 **Generate bash completion script:**
 
 ```bash
-jf completion bash
+jfrog completion bash
 ```
 
 **Install bash completion automatically:**
 
 ```bash
-jf completion bash --install
+jfrog completion bash --install
 ```
 
 **Generate zsh completion script:**
 
 ```bash
-jf completion zsh
+jfrog completion zsh
 ```
 
 **Install zsh completion automatically:**
 
 ```bash
-jf completion zsh --install
+jfrog completion zsh --install
 ```
 
 **Generate fish completion script:**
 
 ```bash
-jf completion fish
+jfrog completion fish
 ```
 
 **Install fish completion automatically:**
 
 ```bash
-jf completion fish --install
+jfrog completion fish --install
 ```
 
 ***
@@ -118,7 +121,7 @@ jf completion fish --install
 
 ### Prerequisites
 
-Artifactory maintains download statistics for repositories so you can evaluate if artifacts are still being used and manage your cleanup policies. When you proxy a repository in another instance of Artifactory and cache an artifact downloaded from the other instance, the distant Artifactory is not aware if users on your end continue to use the artifact (by downloading it from your local cache), and may end up cleaning up the original artifact. An Artifactory Smart Remote Repository lets you notify the distant instance whenever a cached artifact is downloaded, so it can update an internal counter for remote downloads.
+JFrog Artifactory maintains download statistics for repositories so you can evaluate if artifacts are still being used and manage your cleanup policies. When you proxy a repository in another instance of JFrog Artifactory and cache an artifact downloaded from the other instance, the distant JFrog Artifactory is not aware if users on your end continue to use the artifact (by downloading it from your local cache), and may end up cleaning up the original artifact. A JFrog Artifactory Smart Remote Repository lets you notify the distant instance whenever a cached artifact is downloaded, so it can update an internal counter for remote downloads.
 
 Shell completion requires your shell's completion system to be configured. Most package managers handle this automatically.
 
@@ -193,7 +196,7 @@ Shell completion requires your shell's completion system to be configured. Most 
 
 <br />
 
-### bash
+### Bash
 
 **macOS (using Homebrew):**
 
@@ -229,13 +232,13 @@ sudo yum install bash-completion
 **Install JFrog CLI completion:**
 
 ```bash
-jf completion bash --install
+jfrog completion bash --install
 ```
 
 Alternatively, generate the script manually:
 
 ```bash
-jf completion bash > /usr/local/etc/bash_completion.d/jf
+jfrog completion bash > /usr/local/etc/bash_completion.d/jfrog
 ```
 
 Reload your shell:
@@ -245,14 +248,14 @@ source ~/.bash_profile  # macOS
 source ~/.bashrc        # Linux
 ```
 
-### zsh
+### Zsh
 
 **Standard zsh:**
 
 Install completion:
 
 ```bash
-jf completion zsh --install
+jfrog completion zsh --install
 ```
 
 Follow the on-screen instructions to add the completion script location to your `fpath`.
@@ -264,7 +267,7 @@ Alternatively, generate the script manually:
 mkdir -p ~/.zsh/completion
 
 # Generate completion script
-jf completion zsh > ~/.zsh/completion/_jf
+jfrog completion zsh > ~/.zsh/completion/_jfrog
 ```
 
 Add to your `~/.zshrc`:
@@ -316,18 +319,18 @@ if type brew &>/dev/null; then
 fi
 ```
 
-### fish
+### Fish
 
 **Install completion:**
 
 ```bash
-jf completion fish --install
+jfrog completion fish --install
 ```
 
 Alternatively, generate the script manually:
 
 ```bash
-jf completion fish > ~/.config/fish/completions/jf.fish
+jfrog completion fish > ~/.config/fish/completions/jfrog.fish
 ```
 
 Completions will be available in new shell sessions.
@@ -339,14 +342,14 @@ Completions will be available in new shell sessions.
 After installation, test the completion:
 
 1. Open a new terminal session
-2. Type `jf ` and press `Tab`
+2. Type `jfrog ` and press `Tab`
 3. You should see available commands
-4. Type `jf config ` and press `Tab` to see subcommands
+4. Type `jfrog config ` and press `Tab` to see subcommands
 
 Example output:
 
 ```
-$ jf <Tab>
+$ jfrog <Tab>
 add          completion   pip          use
 build        config       rt           version
 c            docker       scan         ...
@@ -368,7 +371,7 @@ c            docker       scan         ...
 If you encounter permission errors, you may need to run the command with `sudo` or adjust file permissions:
 
 ```bash
-sudo jf completion bash --install
+sudo jfrog completion bash --install
 ```
 
 **Oh My Zsh plugin not found:**
@@ -379,10 +382,8 @@ Ensure you have the latest version of Oh My Zsh and that the JFrog CLI is instal
 
 ## See Also
 
-* [jf config](./config.md) - Configure JFrog CLI settings
-* [jf --help](./help.md) - Get help for any command
+* [jfrog config](./config.md) - Configure JFrog CLI settings
+* [jfrog --help](./help.md) - Get help for any command
 * [Environment Variables](./environment-variables.md) - Configure CLI behavior with environment variables
 
 ***
-
-<br />
