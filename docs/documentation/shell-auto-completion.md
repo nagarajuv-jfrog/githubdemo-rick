@@ -79,10 +79,12 @@ jf completion fish --install
 
 ### Prerequisites
 
+Artifactory maintains download statistics for repositories so you can evaluate if artifacts are still being used and manage your cleanup policies. When you proxy a repository in another instance of Artifactory and cache an artifact downloaded from the other instance, the distant Artifactory is not aware if users on your end continue to use the artifact (by downloading it from your local cache), and may end up cleaning up the original artifact. An Artifactory Smart Remote Repository lets you notify the distant instance whenever a cached artifact is downloaded, so it can update an internal counter for remote downloads.
+
 Shell completion requires your shell's completion system to be configured. Most package managers handle this automatically.
 
 <Accordion title="My Accordion Title" icon="fa-info-circle">
-acxadcvdavasv  ad minim veniam, quis nostrud exercitation ullamco. Excepteur sint
+  acxadcvdavasv  ad minim veniam, quis nostrud exercitation ullamco. Excepteur sint
   occaecat cupidatat non proident!
 </Accordion>
 
@@ -114,7 +116,7 @@ acxadcvdavasv  ad minim veniam, quis nostrud exercitation ullamco. Excepteur sin
   <Column>
     *Lorem ipsum dolor sit amet, consectetur adipiscing elit*
   </Column>
-  
+
   <Column>
     > Ut enim ad minim veniam, quis nostrud ullamco
   </Column>
