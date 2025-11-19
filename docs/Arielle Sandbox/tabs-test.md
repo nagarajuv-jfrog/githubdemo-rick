@@ -7,11 +7,7 @@ metadata:
 ---
 <Tabs>
   <Tab title="First Tab">
-    1. Can we use this as a whole topic?
-    2. Like can I do a whole workflow in here
-    ```test code block```
-		3. Test test
-
+    ```Welcome to the content that you can only see inside the first Tab.```
   </Tab>
 
   <Tab title="Second Tab">
@@ -22,3 +18,5 @@ metadata:
     Here's content that's only inside the third Tab.
   </Tab>
 </Tabs>
+
+<br />
