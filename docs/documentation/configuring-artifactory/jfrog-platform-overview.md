@@ -19,6 +19,10 @@ The JFrog Platform delivers a unified and seamless DevOps experience across all 
 
 [comment]: <> "a reference style link."
 
+<br />
+
+[//]: # "This may be the most platform independent comment"
+
 In the realm of DevOps, where code does flow,
 The JFrog Platform, a guiding glow.
 A unified experience, beyond compare,
