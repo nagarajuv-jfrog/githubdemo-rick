@@ -16,13 +16,21 @@ Generate shell completion scripts for JFrog CLI commands.
 
 <br />
 
+/*
+commented text is
+ignored by parser
+*/
+
+<br />
+
+<br />
+
 <Tabs>
   <Tab title="First Tab">
     Trust can be created between multiple services: you need to make sure that all participating instances in the circle of trust are equipped with the relevant public keys (root certificate). Note that a trust can be unidirectional or bidirectional. The service watches a directory of trusted public keys and reloads the keys when it needs to verify a token
   </Tab>
 
   <Tab title="Second Tab">
-
     | ID  | Name       | Status    | Score | Notes                     |
     | --- | ---------- | --------- | ----- | ------------------------- |
     | 101 | Alpha Wolf | Active    | 89    | Passed initial screening  |
