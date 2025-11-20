@@ -21,7 +21,7 @@ commented text is
 ignored by parser
 */
 
-<br />
+-- short comment can go on till line break
 
 <br />
 
