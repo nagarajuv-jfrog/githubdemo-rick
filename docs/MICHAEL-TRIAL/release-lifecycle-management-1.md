@@ -31,3 +31,5 @@ Each action performed on a Release Bundle is tracked within the JFrog Platform, 
 <Callout icon="👍">
   The JFrog CLI includes commands to facilitate the Release Lifecycle Management process. For more information, see ​CLI for JFrog Release Lifecycle Management​​.
 </Callout>
+
+## Required Subscription Levels
