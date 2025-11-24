@@ -34,3 +34,5 @@ Use the menu on the Release Lifecycle page to create a Release Bundle v2 from on
 <Callout icon="👍">
   If a longer Release Bundle name or version is required, use the REST API or the JFrog CLI instead.
 </Callout>
+
+1. <br />
