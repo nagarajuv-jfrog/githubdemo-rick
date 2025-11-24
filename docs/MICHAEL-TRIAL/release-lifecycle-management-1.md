@@ -24,4 +24,10 @@ Each action performed on a Release Bundle is tracked within the JFrog Platform, 
 
 <Image border={false} src="https://files.readme.io/0eba735064e742fa1d1120811b542369268df18e7f0b443281d129c886c7fbad-image.png" />
 
-<br />
+<Callout icon="👍">
+  New to RLM? The ​​JFrog Academy RLM course​​ guides you from initial setup to creating and promoting your first Release Bundle, all with complete governance, trust and auditability.
+</Callout>
+
+<Callout icon="👍">
+  The JFrog CLI includes commands to facilitate the Release Lifecycle Management process. For more information, see ​CLI for JFrog Release Lifecycle Management​​.
+</Callout>
