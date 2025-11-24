@@ -20,3 +20,7 @@ As you complete the wizard, your definitions appear in the Application Details p
    3. Select the maturity level of this application: ​**Unspecified**​​, ​**Experimental**​​, ​**Production**​​, or ​**End of Life**
    4. In the Business Criticality field, define the impact of this application on your business: ​**Unspecified**​​, ​**Low**​​, ​**Medium**​​, ​**High**​​, or ​**Critical**
 5. Click **Next** to continue.​​​​
+6. In ​**step 2​​** of the wizard, optionally enter one or more key-value pairs to act as labels associated with the application. These labels can be used to help identify the application within your organization. Labels are limited to 255 characters, beginning and ending with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between.
+7. Click **Next** to continue.
+8. In **​step 3**​ of the wizard, define the owners of the application. For each owner, select the name of a user or group ​defined​ by the administrator and then click ​**Add**​​.
+9. When you are finished, click **​Create Application​​**. The new application is added to the Applications table.
