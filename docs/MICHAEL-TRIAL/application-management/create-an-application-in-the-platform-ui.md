@@ -11,7 +11,13 @@ As you complete the wizard, your definitions appear in the Application Details p
 
 **To create an application:**
 
-1. Select the project in which the application will reside from the dropdown list.
+1. Select the project in which the application will reside from the dropdown list. 
+
+   <Image align="center" border={false} width="50% " src="https://files.readme.io/295ee03a8bbcc1d477fe058ec077cc222687a80041fd6287b9c9cc2b4faa661a-831848_hpr.png" />
+
+   <Callout icon="📘" theme="info">
+     Applications must be created within the context of a specific project. You cannot create an application when working in All Projects.
+   </Callout>
 2. In the ​**Platform**​ module, select ​**AppTrust > Applications**​​ to display the Applications page.
 3. Click **Create Application** to open the New Application Wizard.
 4. In **step 1** of the wizard define application details:
@@ -24,3 +30,5 @@ As you complete the wizard, your definitions appear in the Application Details p
 7. Click **Next** to continue.
 8. In **​step 3**​ of the wizard, define the owners of the application. For each owner, select the name of a user or group ​defined​ by the administrator and then click ​**Add**​​.
 9. When you are finished, click **​Create Application​​**. The new application is added to the Applications table.
+
+<br />
