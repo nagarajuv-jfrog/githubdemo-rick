@@ -43,6 +43,10 @@ iii. [optional] Select a signing key. If you do not select a key, a default key 
 
 <Image align="center" border={true} width="46% " src="https://files.readme.io/a30b0d02293e948956081ebf148708f85f2aec32f9e491cff9a7c69d663e92cf-image.png" className="border" />
 
-<br />
-
 4. Click **Next** to move to the **Builds Selection** tab.
+5. Define the builds from which to create the Release Bundle:
+   1. Select the build name and version from the lists provided.
+   2. [optional] Select the **Include Build Dependencies** checkbox to have the Release Bundle include the dependencies associated with the build.
+   3. Click **Add**. The selected build and version appear in the selection box.
+6. [optional] Repeat step 5 to add additional builds to the new Release Bundle.
+7. Click **Create**.
