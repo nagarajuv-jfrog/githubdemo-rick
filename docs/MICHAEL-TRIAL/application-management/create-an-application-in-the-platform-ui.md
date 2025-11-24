@@ -19,6 +19,8 @@ As you complete the wizard, your definitions appear in the Application Details p
      Applications must be created within the context of a specific project. You cannot create an application when working in All Projects.
    </Callout>
 2. In the ​**Platform**​ module, select ​**AppTrust > Applications**​​ to display the Applications page.
+
+   <Image align="center" border={true} width="50% " src="https://files.readme.io/54077bd914b3d329760f0bfbf6579b21431ee9c0f21a3177dd893b55061b34e2-901652_hpr.png" className="border" />
 3. Click **Create Application** to open the New Application Wizard.
 4. In **step 1** of the wizard define application details:
    1. Enter a unique display name and key for the application. The key must contain between 2-64 lowercase alphanumeric characters and hyphens, beginning with a letter.
