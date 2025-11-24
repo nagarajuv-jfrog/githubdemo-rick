@@ -18,4 +18,5 @@ As you complete the wizard, your definitions appear in the Application Details p
    1. Enter a unique display name and key for the application. The key must contain between 2-64 lowercase alphanumeric characters and hyphens, beginning with a letter.
    2. Add an optional description of the application.
    3. Select the maturity level of this application: ​**Unspecified**​​, ​**Experimental**​​, ​**Production**​​, or ​**End of Life**
-   4. In the Business Criticality field, define the impact of this application on your business: ​**Unspecified**​​, ​**Low**​​, ​**Medium**​​, ​**High**​​, or ​**Critical**​​​​
+   4. In the Business Criticality field, define the impact of this application on your business: ​**Unspecified**​​, ​**Low**​​, ​**Medium**​​, ​**High**​​, or ​**Critical**
+5. Click **Next** to continue.​​​​
