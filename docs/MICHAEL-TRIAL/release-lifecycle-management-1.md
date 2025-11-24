@@ -21,3 +21,7 @@ JFrog’s Release Lifecycle Management solution centers around controlling the f
 Users with Artifactory 7.68.9 and above and JFrog Xray 3.82.6 and above can scan the contents of Release Bundles v2 and potentially block these Release Bundles from being promoted if Policy violations are identified. Users with JFrog Distribution 2.20.1 and above can also use Xray to block vulnerable Release Bundles from being distributed.
 
 Each action performed on a Release Bundle is tracked within the JFrog Platform, including creation, promotion, and distribution, and creates signed metadata (known as evidence) attesting to that action. For more information, see ​[→Evidence Management]​​.
+
+<Image border={false} src="https://files.readme.io/0eba735064e742fa1d1120811b542369268df18e7f0b443281d129c886c7fbad-image.png" />
+
+<br />
