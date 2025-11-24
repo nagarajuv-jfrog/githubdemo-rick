@@ -45,8 +45,11 @@ iii. [optional] Select a signing key. If you do not select a key, a default key 
 
 4. Click **Next** to move to the **Builds Selection** tab.
 5. Define the builds from which to create the Release Bundle:
+
    1. Select the build name and version from the lists provided.
-   2. [optional] Select the **Include Build Dependencies** checkbox to have the Release Bundle include the dependencies associated with the build.
+   2. [optional] Select the **Include Build Dependencies** checkbox to have the Release Bundle include the dependencies associated with the build. Dependencies located in local, Federated, and remote repositories can be included in the Release Bundle. To include dependencies from a remote repository, you must first ensure that they exist in the remote cache. If they are not in the cache, you need to download them before creating the Release Bundle.
    3. Click **Add**. The selected build and version appear in the selection box.
 6. [optional] Repeat step 5 to add additional builds to the new Release Bundle.
 7. Click **Create**.
+
+<br />
