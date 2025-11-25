@@ -1,0 +1,304 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Artifactory Security - Deprecated Security Apis",
+    "description": "Provides endpoints for managing security configurations and user groups in Artifactory, including deprecated APIs for users and groups.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/artifactory/api/security/users/authorization/expirePassword/{userName}": {
+      "post": {
+        "description": "Expires a user's password",
+        "operationId": "expirePasswordForSingleUser",
+        "parameters": [
+          {
+            "name": "userName",
+            "in": "path",
+            "required": true,
+            "description": "The username of the user whose password is to be expired",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password expired successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "deprecated": true
+      }
+    },
+    "/artifactory/api/security/groups/{groupName}": {
+      "get": {
+        "summary": "Get Group Details",
+        "description": "Get the details of an Artifactory Group",
+        "operationId": "getGroupDetails",
+        "parameters": [
+          {
+            "name": "groupName",
+            "in": "path",
+            "required": true,
+            "description": "The name of the group",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeUsers",
+            "in": "query",
+            "required": false,
+            "description": "Include user details",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/security/users": {
+      "get": {
+        "tags": [],
+        "summary": "Get Users",
+        "description": "Get the users list",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "uri": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "realm": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "name": "davids",
+                    "uri": "http://localhost:8082/artifactory/api/security/users/davids",
+                    "realm": "internal"
+                  },
+                  {
+                    "name": "danl",
+                    "uri": "http://localhost:8082/artifactory/api/security/users/danl",
+                    "realm": "ldap"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "deprecated": true
+      }
+    },
+    "/artifactory/api/security/groups": {
+      "get": {
+        "summary": "Get Groups",
+        "description": "Get the groups list",
+        "deprecated": true,
+        "operationId": "getGroups",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "name": "readers",
+                    "uri": "http://localhost:8081/artifactory/api/security/groups/readers"
+                  },
+                  {
+                    "name": "tech-leads",
+                    "uri": "http://localhost:8081/artifactory/api/security/groups/tech-leads"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/system/security": {
+      "post": {
+        "summary": "Save Security Configuration (Deprecated)",
+        "description": "Save the security configuration (security.xml). Requires the security.xml file from the same version.",
+        "deprecated": true,
+        "operationId": "saveSecurityConfiguration",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "requestBody": {
+          "description": "security.xml file",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "type": "string",
+                "example": "<security.xml/>"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/artifactory/api/security/users/{userName}": {
+      "post": {
+        "description": "Updates an existing user in Artifactory with the provided user details.",
+        "summary": "Update User",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "userName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User successfully updated"
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/security/users/authorization/changePassword": {
+      "post": {
+        "summary": "Change Password",
+        "description": "Changes a user's password",
+        "operationId": "changePassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userName": {
+                    "type": "string",
+                    "description": "The username of the user"
+                  },
+                  "oldPassword": {
+                    "type": "string",
+                    "description": "The current password of the user"
+                  },
+                  "newPassword1": {
+                    "type": "string",
+                    "description": "The new password for the user"
+                  },
+                  "newPassword2": {
+                    "type": "string",
+                    "description": "Verification of the new password"
+                  }
+                },
+                "required": [
+                  "userName",
+                  "oldPassword",
+                  "newPassword1",
+                  "newPassword2"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "tags": []
+}
