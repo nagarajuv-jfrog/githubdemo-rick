@@ -1,0 +1,189 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Import Export",
+    "description": "Endpoints for importing and exporting system data and repositories within Artifactory.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/artifactory/api/import/system": {
+      "post": {
+        "tags": [],
+        "summary": "Full System Import",
+        "description": "Import full system from a server local Artifactory export directory. From version 5.10, Artifactory maintains any security entities (users, groups, permissions and tokens) when doing a system import.",
+        "operationId": "importFullSystem",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/artifactory/api/import/repositories": {
+      "post": {
+        "description": "Import one or more repositories.",
+        "operationId": "importRepositoryContent",
+        "security": [
+          {
+            "adminUser": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "description": "The file system path to import from. This may point to a specific folder to import data for a single repository, or to the parent 'repositories' folder to import data for all repositories.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repo",
+            "in": "query",
+            "description": "Empty/null repo -> all",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "metadata",
+            "in": "query",
+            "description": "Include metadata - default 1",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "verbose",
+            "in": "query",
+            "description": "Verbose - default 0",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Import successful",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/export/system": {
+      "get": {
+        "description": "Returned default Export Settings JSON.",
+        "summary": "Export System Settings Example",
+        "operationId": "exportSystemSettingsExample",
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Export Settings JSON",
+            "content": {
+              "application/vnd.org.jfrog.artifactory.system.ExportSettings+json": {
+                "example": {
+                  "exportPath": "/export/path",
+                  "includeMetadata": true,
+                  "createArchive": false,
+                  "bypassFiltering": false,
+                  "verbose": false,
+                  "failOnError": true,
+                  "failIfEmpty": true,
+                  "m2": false,
+                  "incremental": false,
+                  "excludeContent": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/artifactexport/repository": {
+      "post": {
+        "description": "Export repository with its metadata.",
+        "operationId": "exportRepositoryWithMetadata",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "example": "repository"
+                  },
+                  "path": {
+                    "type": "string",
+                    "example": "/path/to/export/location"
+                  },
+                  "repository": {
+                    "type": "string",
+                    "example": "repo-local"
+                  },
+                  "excludeMetadata": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "m2": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "verbose": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                },
+                "required": [
+                  "action",
+                  "path",
+                  "repository"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Export successful",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Repository not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}
