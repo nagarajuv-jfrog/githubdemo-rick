@@ -1,0 +1,117 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Loggers",
+    "description": "API for managing logger debug levels in an Artifactory instance. Allows retrieving and setting temporary debug levels for loggers to aid in debugging and troubleshooting.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/artifactory/api/system/debug/loggers/{className}": {
+      "get": {
+        "tags": [],
+        "summary": "Get Logger Debug Level",
+        "description": "Returns the current debug level configuration for the specified logger. In HA environments, it returns the debug level from whichever node receives the request.",
+        "operationId": "getLoggerDebugLevel",
+        "parameters": [
+          {
+            "name": "className",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name of the logger whose debug level you want returned (for example, org.dummy.Class)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetched",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "debug": {
+                    "value": "debug"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/system/debug/loggers": {
+      "post": {
+        "tags": [],
+        "summary": "Set Logger Debug Levels",
+        "description": "Defines a temporary debug level for one or more loggers in memory without changing the logback.xml file. This request can be used to collect more detailed log information for a short period of time to help investigate a particular issue. When the defined time interval expires, the logger debug level is reset to its previous value.",
+        "operationId": "setLoggerDebugLevels",
+        "requestBody": {
+          "description": "The request includes the following information:",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "classes": {
+                    "type": "object",
+                    "description": "The names of the loggers whose debug level you want to change temporarily, and the debug level to define for each one. Debug levels include: trace, debug, info, warn, error, fatal.",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "timer": {
+                    "type": "integer",
+                    "description": "The amount of time to keep the loggers at the defined debug level (in seconds). When the interval expires, the loggers are reset to the previous debug level."
+                  }
+                },
+                "required": [
+                  "classes",
+                  "timer"
+                ]
+              },
+              "example": {
+                "classes": {
+                  "org.dummy.Class": "debug",
+                  "org.dummy.OtherClass": "INFO"
+                },
+                "timer": 60
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logger levels configured successfully"
+          },
+          "400": {
+            "description": "Bad Request. Examples include: No loggers defined, Too many loggers defined (maximum is 100), timer set to < 0"
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ]
+      }
+    }
+  },
+  "tags": []
+}
