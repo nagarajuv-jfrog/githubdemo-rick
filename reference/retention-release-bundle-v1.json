@@ -1,0 +1,36 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Retention Release Bundle V1",
+    "description": "Provides endpoints for managing and retrieving retention policy configurations in the Artifactory system.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/artifactory/api/v1/bundle/retention/config/enable": {
+      "get": {
+        "description": "Gets the activation status of the retention policies.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enable": {
+                      "type": "boolean",
+                      "description": "Indicates if the retention policies are enabled."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getArtifactoryApiV1BundleRetentionConfigEnable"
+      }
+    }
+  },
+  "tags": []
+}
