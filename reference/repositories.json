@@ -1,0 +1,1404 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Repositories",
+    "version": "1.0.0",
+    "description": "Provides APIs to manage and interact with repository configurations, including recalculating indexes, listing branches and tags, removing repositories, and more."
+  },
+  "paths": {
+    "/artifactory/api/npm/{repoKey}/reindex": {
+      "post": {
+        "description": "Recalculates the npm packages indexes for this repository. See the npm integration documentation for more details. Supported by local repositories. Requires Artifactory Pro. Up to version 4.8, requires a valid admin user. From version 4.8 only requires the set of permissions assumed by Manage (Manage + Delete/Overwrite + Deploy/Cache + Annotate + Read).",
+        "operationId": "calculateNpmRepositoryMetadata",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recalculating index for npm repository {repoKey} scheduled to run",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/vcs/branches/{repoKey}/{userOrg}/{repo}": {
+      "get": {
+        "description": "Lists all VCS branches.",
+        "operationId": "getVcsBranches",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userOrg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "commitId": {
+                        "type": "string"
+                      },
+                      "isBranch": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/v2/repositories/batch": {
+      "post": {
+        "description": "Updates the configuration of multiple repositories using a batch request. The batch request can contain a mix of different package types and repository types.",
+        "operationId": "updateMultipleRepositories",
+        "summary": "Update Multiple Repositories",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "packageType": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "notes": {
+                      "type": "string"
+                    },
+                    "includesPattern": {
+                      "type": "string"
+                    },
+                    "excludesPattern": {
+                      "type": "string"
+                    },
+                    "rclass": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "packageType",
+                    "rclass"
+                  ]
+                }
+              },
+              "example": [
+                {
+                  "key": "wproj-dev-docker-local-1",
+                  "packageType": "docker",
+                  "description": "local-1",
+                  "notes": "belongs to team 1",
+                  "includesPattern": "**/*",
+                  "excludesPattern": "",
+                  "rclass": "local"
+                },
+                {
+                  "key": "wproj-dev-docker-local-2",
+                  "packageType": "docker",
+                  "description": "local-2",
+                  "notes": "belongs to team 2",
+                  "includesPattern": "**/*",
+                  "excludesPattern": "",
+                  "rclass": "local"
+                }
+              ]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Repositories updated successfully"
+          },
+          "400": {
+            "description": "Bad request; batch limit exceeded; mandatory keys not configured"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/artifactory/api/deb/indexCached/{repoKey}": {
+      "post": {
+        "summary": "Calculate Cached Remote Debian Repository Coordinates",
+        "description": "Calculates/recalculates the Debian packages coordinates. Supported by remote-cache repositories only. From version 6.6.0, the coordinates calculation/recalculation process adds Debian packages the missing coordinates (Architecture, Distribution and Component) as properties, so they could be indexed if they would be copied/moved to a Debian local repository. Local repository indexing/reindexing requires those properties in order to work.",
+        "operationId": "calculateCachedRemoteDebianRepositoryCoordinates",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The key of the repository to calculate/recalculate coordinates for."
+          }
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recalculating coordinates for Debian cached repository {repoKey} is scheduled to run.",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/deb/reindex/{repoKey}": {
+      "post": {
+        "description": "Calculates/recalculates the Packages and Release metadata for this repository, based on the Debian packages in it. Calculation can be synchronous (the default) or asynchronous. Supported by local repositories only. From version 4.4, by default, the recalculation process also writes several entries from the Debian package's metadata as properties on all of the artifacts (based on the control file's content). This operation may not always be required (for example, if the Debian files are intact and were not modified, only the index needs to be recalculated. The operation is resource intensive and can be disabled by passing the `?writeProps=0` query param. From version 5.7, the target repository can be a virtual repository. Requires Artifactory Pro. Up to version 4.8, requires a valid admin user. From version 4.8 only requires the set of permissions assumed by Manage (Manage + Delete/Overwrite + Deploy/Cache + Annotate + Read).",
+        "operationId": "calculateDebianRepositoryMetadata",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "tags": [],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "writeProps",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "X-GPG-PASSPHRASE",
+            "in": "header",
+            "required": false,
+            "description": "Passphrase (optional)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recalculating index for Debian repository scheduled to run.",
+            "content": {
+              "text/plain": {
+                "example": "POST /artifactory/api/deb/reindex/debian-local\n\nRecalculating index for Debian repository debian-local scheduled to run."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/swift/{repoKey}/reindex": {
+      "post": {
+        "description": "Calculates a Swift index for the specified repository. Requires Artifactory Pro.",
+        "operationId": "calculateSwiftRepositoryMetadata",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reindexing of Swift repository {repoKey} was scheduled to run.",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/pub/{repoKey}/reindex": {
+      "post": {
+        "description": "Calculates/recalculates the Dart/ Flutter packages and release metadata for this repository. The calculation is asynchronous. Supported for local and remote repositories.",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "Repository key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "description": "Run asynchronously",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully triggered calculation",
+            "content": {
+              "application/text": {}
+            }
+          }
+        },
+        "operationId": "postArtifactoryApiPubRepokeyReindex"
+      }
+    },
+    "/artifactory/api/terraform/{repoKey}/reindex": {
+      "post": {
+        "description": "Calculates Terraform Modules or Providers index for the specified repository.",
+        "operationId": "calculateTerraformRepositoryMetadata",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reindexing of Terraform repository {repoKey} was scheduled to run.",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        },
+        "tags": []
+      }
+    },
+    "/artifactory/api/nuget/{repoKey}/reindex": {
+      "post": {
+        "description": "Recalculates all the NuGet packages for this repository (local/cache/virtual), and re-annotate the NuGet properties for each NuGet package according to its internal nuspec file. Up to version 4.7 and below, requires admin user. From version 4.8, requires Manage, Delete/Overwrite, Deploy/Cache, Annotate, and Read permissions.",
+        "operationId": "calculateNugetRepositoryMetadata",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "NuGet reindex calculation for repository '{repoKey}' accepted.",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/maven": {
+      "post": {
+        "description": "Calculates/caches a Maven index for the specified repositories.",
+        "operationId": "calculateMavenIndex",
+        "parameters": [
+          {
+            "name": "repos",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated list of repositories to include in the index",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "force",
+            "in": "query",
+            "required": false,
+            "description": "Force recalculation (0 or 1)",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          }
+        ],
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Maven index refresh has been accepted.",
+            "content": {
+              "application/text": {
+                "example": "Maven index refresh for repositories '[libs-release-local, ext-release-local]' has been accepted."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/bower/{repoKey}/reindex": {
+      "post": {
+        "description": "Recalculates the index for a Bower repository.",
+        "security": [
+          {
+            "admin_user": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "The key of the Bower repository to reindex",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bower index refresh for the specified repository has been accepted",
+            "content": {
+              "application/text": {}
+            }
+          }
+        },
+        "operationId": "postArtifactoryApiBowerRepokeyReindex"
+      }
+    },
+    "/artifactory/api/maven/calculateMetadata/{repoKey}/{folder-path}": {
+      "post": {
+        "description": "Calculates Maven metadata on the specified path (for local repositories only). A POM file must exist in the repository for the calculation to succeed.",
+        "operationId": "calculateMavenMetadata",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The key of the repository"
+          },
+          {
+            "name": "folder-path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The path to the folder"
+          },
+          {
+            "name": "noneRecursive",
+            "in": "query",
+            "required": false,
+            "description": "If false, the folder and all its contents will be calculated recursively",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        },
+        "security": [],
+        "tags": []
+      }
+    },
+    "/artifactory/api/yum/{repoKey}": {
+      "post": {
+        "description": "For Local repositories: calculates/recalculates the YUM metadata for this repository, based on the RPM package currently hosted in the repository. Supported by local, virtual, and Federated repositories. Calculation can be synchronous (the default) or asynchronous. For Virtual repositories, calculates the merged metadata from all aggregated repositories on the specified path. The path parameter must be passed for virtual calculation. Requires Artifactory Pro. Immediate calculation requests cannot be called on repositories with automatic asynchronous calculations enabled (applies to local repositories only). The path parameter applies to virtual repositories only. Up to version 4.8, requires a valid admin user. From version 4.8 only requires the set of permissions assumed by Manage (Manage + Delete/Overwrite + Deploy/Cache + Annotate + Read).",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "Repository key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "description": "Path to repodata dir (applies to virtual repositories only)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "description": "Flag to indicate if the calculation should be asynchronous (0 or 1)",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "X-GPG-PASSPHRASE",
+            "in": "header",
+            "required": false,
+            "description": "Passphrase",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "YUM metadata calculation for repository accepted",
+            "content": {
+              "application/text": {
+                "schema": {
+                  "type": "string",
+                  "example": "YUM metadata calculation for repository 'yum-local' accepted."
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postArtifactoryApiYumRepokey"
+      }
+    },
+    "/artifactory/api/pypi/{repoKey}/reindex": {
+      "post": {
+        "description": "Calculates/recalculates the PyPI packages and repository indexes from the artifact metadata in this repository.",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "The key of the repository",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "description": "Indicates whether the calculation should be asynchronous (1) or synchronous (0)",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recalculating index for pypi repository scheduled to run",
+            "content": {
+              "text/plain": {
+                "example": "Recalculating index for pypi repository pypi-local scheduled to run"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "managePermissions": []
+          }
+        ],
+        "operationId": "postArtifactoryApiPypiRepokeyReindex"
+      }
+    },
+    "/artifactory/api/conan/conan-local/reindex": {
+      "post": {
+        "description": "Calculates/recalculates the Conan packages and release metadata for this repository. The calculation can be synchronous (the default) or asynchronous. Supported for local repositories only. Requires Artifactory Pro.",
+        "security": [
+          {
+            "adminUser": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ],
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recalculating index for Conan repository conan-local scheduled to run.",
+            "content": {
+              "application/text": {}
+            }
+          }
+        },
+        "operationId": "postArtifactoryApiConanConanLocalReindex"
+      }
+    },
+    "/artifactory/api/deb/{repoKey}/snapshot": {
+      "post": {
+        "summary": "Create Debian Snapshot",
+        "description": "Creates Debian Snapshots in the Debian repository in Artifactory.",
+        "operationId": "createDebianSnapshot",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "Set to 1 to save the snapshot asynchronously."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string"
+                  },
+                  "targetRepo": {
+                    "type": "string"
+                  },
+                  "distribution": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "tag",
+                  "targetRepo",
+                  "distribution"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully saved snapshot",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Successfully saved snapshot to ${targetRepo}/snapshots/${tag}"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Snapshot save queued",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Snapshot save queued for ${targetRepo}/snapshots/${tag}"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "authenticatedUser": []
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/artifactory/api/maven/generatePom/{repoKey}/{jar-file-path}": {
+      "post": {
+        "summary": "Generate Maven POM File",
+        "description": "Generates a Maven POM file from an internal Jar or a default POM file.",
+        "security": [
+          {
+            "auth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "jar-file-path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "POM file generated successfully."
+          }
+        },
+        "tags": [],
+        "operationId": "postArtifactoryApiMavenGeneratepomRepokeyJarFilePath"
+      }
+    },
+    "/artifactory/api/helm/{repoKey}/reindex": {
+      "post": {
+        "summary": "Calculate Helm Chart Index",
+        "description": "Calculates Helm chart index on the specified path (local and Federated repositories only). Requires Manage, Delete/Overwrite, Deploy/Cache, Annotate, and Read permissions.",
+        "operationId": "calculateHelmRepositoryMetadata",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/repositories/{repoKey}": {
+      "delete": {
+        "description": "Removes a repository configuration together with the whole repository content. Supported by local, remote, virtual and federated repositories.",
+        "operationId": "deleteRepository",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "The key of the repository to be deleted",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Repository and all its content have been removed successfully.",
+            "content": {
+              "application/text": {
+                "example": "Repository 'libs-release-local' and all its content have been removed successfully."
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/cargo/{repoKey}/reindex": {
+      "post": {
+        "description": "Calculates/recalculates the Cargo packages and release metadata for this repository. The calculation can be synchronous (the default) or asynchronous. Supported for local and remote repositories.",
+        "operationId": "calculateCargoRepositoryMetadata",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "Repository key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "description": "Flag to indicate if the calculation should be asynchronous",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recalculating index for Cargo repository scheduled to run.",
+            "content": {
+              "text/plain": {
+                "example": "Recalculating index for Cargo repository cargo-local scheduled to run."
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin_auth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/repositories/{remoteRepoName}/configuration": {
+      "get": {
+        "summary": "Remote Repository Configuration (Deprecated)",
+        "description": "Returns the shared configuration of a remote repository.",
+        "deprecated": true,
+        "operationId": "getRemoteRepositoryConfiguration",
+        "parameters": [
+          {
+            "name": "remoteRepoName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "repository-config": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/conda/conda-local/reindex": {
+      "post": {
+        "summary": "Calculate Conda Repository Metadata",
+        "description": "Calculates/recalculates the Conda packages and release metadata for this repository. The calculation can be synchronous (the default) or asynchronous. Supported for local repositories only. Requires Artifactory Pro.",
+        "operationId": "calculateCondaRepositoryMetadata",
+        "parameters": [
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ],
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recalculating index for Conda repository conda-local scheduled to run.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Recalculating index for Conda repository conda-local scheduled to run."
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/artifactory/api/alpine/{repoKey}/reindex": {
+      "post": {
+        "tags": [],
+        "summary": "Calculate Alpine Repository Metadata",
+        "description": "Calculates/recalculates the metadata index for this repository, based on the Alpine packages in it. Calculation is asynchronous. Supported by local repositories only.",
+        "operationId": "calculateAlpineRepositoryMetadata",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Key of the repository to be reindexed"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reindexing of Alpine repository was scheduled to run.",
+            "content": {
+              "text/plain": {
+                "example": "Reindexing of Alpine repository alpine-local was scheduled to run."
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/cocoapods/{repoKey}/reindex": {
+      "post": {
+        "summary": "Calculate CocoaPods Index",
+        "description": "Calculates a CocoaPods index for the specified repository.",
+        "operationId": "calculateCocoaPodsRepositoryMetadata",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reindexing of CocoaPods repository was scheduled to run.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/v2/repositories/{repoKey}": {
+      "get": {
+        "description": "Returns the current configuration of a repository, providing only those fields that are relevant to the package type. Supported by local, remote, virtual, and Federated repositories.",
+        "summary": "Get Repository Configuration (v2)",
+        "operationId": "getRepositoryConfigurationV2",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "The key of the repository",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "key": "generic-local",
+                  "type": "local",
+                  "packageType": "generic",
+                  "description": "",
+                  "notes": "",
+                  "includesPattern": "**/*",
+                  "excludesPattern": "",
+                  "repoLayoutRef": "maven-2-default",
+                  "blackedOut": false,
+                  "propertySets": [],
+                  "archiveBrowsingEnabled": false,
+                  "downloadRedirect": false,
+                  "xrayIndex": false,
+                  "cdnRedirect": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/opkg/reindex/{repoKey}": {
+      "post": {
+        "description": "Calculates/recalculates the Packages and Release metadata for this repository, based on the ipk packages in it (in each feed location). Calculation can be synchronous (the default) or asynchronous. Supported by local repositories only. By default, the recalculation process also writes several entries from the ipk package's metadata as properties on all of the artifacts (based on the control file's content). This operation may not always be required (for example, if the ipk files are intact and were not modified, only the index needs to be recalculated. The operation is resource intensive and can be disabled by passing the `?writeProps=0` query param.",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "The key of the repository to recalculate metadata for.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "description": "Determines if the calculation is asynchronous (1) or synchronous (0). Defaults to synchronous.",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "writeProps",
+            "in": "query",
+            "required": false,
+            "description": "Determines if the recalculation process writes several entries from the ipk package's metadata as properties on all of the artifacts (1) or not (0). Defaults to writing properties.",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "X-GPG-PASSPHRASE",
+            "in": "header",
+            "required": false,
+            "description": "Optional GPG passphrase for the request.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response indicating that the recalculation of the index for the specified Opkg repository has been scheduled.",
+            "content": {
+              "application/text": {
+                "example": "Recalculating index for Opkg repository opkg-local scheduled to run."
+              }
+            }
+          }
+        },
+        "operationId": "postArtifactoryApiOpkgReindexRepokey"
+      }
+    },
+    "/artifactory/api/vcs/tags/{repoKey}/{userOrg}/{repo}": {
+      "get": {
+        "tags": [],
+        "summary": "Get VCS Tags",
+        "description": "Lists all VCS tags.",
+        "operationId": "getVcsTags",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userOrg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "commitId": {
+                        "type": "string"
+                      },
+                      "isBranch": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "privilegedUser": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/cran/reindex/cran-local": {
+      "post": {
+        "description": "Calculates/recalculates the Packages and Release metadata for this repository, based on the CRAN packages in it. The calculation can be synchronous (the default) or asynchronous. Supported by local repositories only. From version 6.1, by default, the recalculation process also writes several entries from the CRAN package's metadata as properties on all of the artifacts (based on the control file's content).",
+        "operationId": "calculateCranRepositoryMetadata",
+        "parameters": [
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ],
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recalculating index for CRAN repository cran-local scheduled to run.",
+            "content": {
+              "application/text": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ArtifactoryPro": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/gems/{repoKey}/reindex": {
+      "post": {
+        "description": "Calculates RubyGems index on the specified path. Requires Manage, Delete/Overwrite, Deploy/Cache, Annotate, and Read permissions.",
+        "operationId": "calculateRubygemsRepositoryMetadata",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/cran/{repoKey}/move-archives": {
+      "get": {
+        "summary": "Move CRAN Archives",
+        "description": "Moves the existing archives from the wrong location to the correct location (if the system property is enabled).",
+        "operationId": "moveCranArchives",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Artifacts moved on repoKey",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Artifacts moved on repoKey: repo-local: 33"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/repositories": {
+      "get": {
+        "description": "Returns a list of minimal repository details for all repositories of the specified type. Filter the results using the following parameters:\n- `type` for repositories of a specific type (local, remote, virtual, federated, distributed)\n- `packageType` for repositories of a specific package type\n- `project` for repositories assigned to a specific project\n\nNote: Federated repositories are supported from Artifactory 7.18.3 and require an Enterprise X or Enterprise+ subscription.\n\nSince: 2.2.0 (packageType option was introduced in version 6.2.0)\n\nSecurity: Requires a privileged user (can be anonymous)\n\nUsage: `GET /artifactory/api/repositories[?type=(local|remote|virtual|federated|distribution)]| [&packageType=bower|cargo|chef|cocoapods|composer|conan|cran |debian|docker|gems|gitlfs|go|gradle|helm|ivy|maven|nuget|opkg|p2|pub|puppet |pypi|rpm|sbt|swift|terraform|vagrant|yum|generic]| [&project=projectKey]`",
+        "operationId": "getRepositories",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "local",
+                "remote",
+                "virtual",
+                "federated",
+                "distribution"
+              ]
+            }
+          },
+          {
+            "name": "packageType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "project",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "packageType": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": []
+      }
+    }
+  },
+  "tags": []
+}
