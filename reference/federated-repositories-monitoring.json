@@ -1,0 +1,365 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Federated Repositories - Artifactory Federation Service Monitoring",
+    "version": "1.0.0",
+    "description": "Monitor and manage the state and prioritization of federated repositories within your JPD (JFrog Platform Deployment). Ensure timely synchronization and assess connection statuses for optimal performance."
+  },
+  "paths": {
+    "/artifactory/api/federation/status/stateList": {
+      "get": {
+        "description": "Returns the current state of each repository Federation configured on your JPD.",
+        "operationId": "getFederationStateDetails",
+        "summary": "Get Federation State Details",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "federations": [
+                    {
+                      "localRepoKey": "rtfs-dev-master-maven-local-2",
+                      "memberInfoList": [
+                        {
+                          "url": "https://my-ci-blue.jfrog.io/artifactory",
+                          "repoKey": "rtfs-dev-master-maven-local-2",
+                          "aggregatedStatus": "HEALTHY",
+                          "supported": true,
+                          "disabled": false,
+                          "inLag": false
+                        },
+                        {
+                          "url": "https://my-ci-green.jfrog.io/artifactory",
+                          "repoKey": "rtfs-dev-master-maven-local-2",
+                          "aggregatedStatus": "N/A",
+                          "supported": false,
+                          "disabled": false,
+                          "inLag": false
+                        }
+                      ],
+                      "priority": "HIGH"
+                    },
+                    {
+                      "localRepoKey": "artifactory-federation-1",
+                      "memberInfoList": [
+                        {
+                          "url": "https://my-ci-blue.jfrog.io/artifactory",
+                          "repoKey": "artifactory-federation-1",
+                          "aggregatedStatus": "DELAYED",
+                          "supported": true,
+                          "disabled": false,
+                          "inLag": true
+                        },
+                        {
+                          "url": "https://my-ci-green.jfrog.io/artifactory",
+                          "repoKey": "artifactory-federation-1",
+                          "aggregatedStatus": "PENDING_FS",
+                          "supported": true,
+                          "disabled": false,
+                          "inLag": true
+                        }
+                      ],
+                      "priority": "STANDARD"
+                    },
+                    {
+                      "localRepoKey": "rtfs-dev-master-docker-local-1",
+                      "memberInfoList": [
+                        {
+                          "url": "https://my-ci-blue.jfrog.io/artifactory",
+                          "repoKey": "rtfs-dev-master-docker-local-1",
+                          "aggregatedStatus": "ERROR",
+                          "supported": true,
+                          "disabled": false,
+                          "inLag": true
+                        },
+                        {
+                          "url": "https://my-ci-green.jfrog.io/artifactory",
+                          "repoKey": "rtfs-dev-master-docker-local-1",
+                          "aggregatedStatus": "DISABLED",
+                          "supported": false,
+                          "disabled": true,
+                          "inLag": false
+                        }
+                      ],
+                      "priority": "STANDARD"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Permission Denied"
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/federation/prioritization/{repo-key}": {
+      "put": {
+        "tags": [],
+        "summary": "Prioritize Federated Repository",
+        "description": "Determines whether the queue of the specified Federated repository has priority access to system resources. Prioritizing the repository helps ensure timely synchronization of its events with other members of the Federation.",
+        "operationId": "prioritizeFederatedRepository",
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The key of the Federated repository."
+          },
+          {
+            "name": "priorityLevel",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "high",
+                "standard"
+              ]
+            },
+            "description": "Defines the priority level assigned to the Federated repository."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The repository was prioritized/deprioritized successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "The repository priority has been changed to %s."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "The repository was not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/federation/status/stateSummary": {
+      "get": {
+        "tags": [],
+        "summary": "Get Federation State Summaries",
+        "description": "Returns the number of Federation members that are currently in each of the following states: HEALTHY, NOT_AVAILABLE, DELAYED, PENDING_FS, FULL_SYNC_RUNNING, ERROR, DISABLED",
+        "operationId": "getFederationStateSummaries",
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "federationStates": {
+                    "HEALTHY": 6,
+                    "NOT_AVAILABLE": 1,
+                    "DELAYED": 2,
+                    "PENDING_FS": 1,
+                    "FULL_SYNC_RUNNING": 1,
+                    "ERROR": 0,
+                    "DISABLED": 0
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "federationStates": {
+                      "type": "object",
+                      "properties": {
+                        "HEALTHY": {
+                          "type": "integer"
+                        },
+                        "NOT_AVAILABLE": {
+                          "type": "integer"
+                        },
+                        "DELAYED": {
+                          "type": "integer"
+                        },
+                        "PENDING_FS": {
+                          "type": "integer"
+                        },
+                        "FULL_SYNC_RUNNING": {
+                          "type": "integer"
+                        },
+                        "ERROR": {
+                          "type": "integer"
+                        },
+                        "DISABLED": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Permission Denied"
+          }
+        }
+      }
+    },
+    "/artifactory/api/federation/status/connectionStates/{repo-name}": {
+      "get": {
+        "description": "Returns the connection status of a Federated repository with other members of its Federation.",
+        "operationId": "getFederationConnectionDetails",
+        "parameters": [
+          {
+            "name": "repo-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name of the repository."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "memberConnections": [
+                        {
+                          "localRepoKey": "priority_test_repo_1",
+                          "localPlatformUrl": "https://my-ci-green.jfrog.io/artifactory",
+                          "remoteRepoKey": "repo_1_high",
+                          "remotePlatformUrl": "https://my-ci-blue.jfrog.io/artifactory",
+                          "status": "HEALTHY",
+                          "lagInMs": 0,
+                          "queuedEvents": 0,
+                          "disabled": false,
+                          "supported": true
+                        },
+                        {
+                          "localRepoKey": "repo_1_high",
+                          "localPlatformUrl": "https://my-ci-blue.jfrog.io/artifactory",
+                          "remoteRepoKey": "priority_test_repo_1",
+                          "remotePlatformUrl": "https://my-ci-green.jfrog.io/artifactory",
+                          "status": "N/A",
+                          "lagInMs": 0,
+                          "queuedEvents": 0,
+                          "disabled": false,
+                          "supported": false
+                        }
+                      ]
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "memberConnections": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "localRepoKey": {
+                            "type": "string",
+                            "description": "The repository key of the Federated repository on the local JPD that serves as the source of the connection."
+                          },
+                          "localPlatformUrl": {
+                            "type": "string",
+                            "description": "The URL of the Federated repository on the local JPD."
+                          },
+                          "remoteRepoKey": {
+                            "type": "string",
+                            "description": "The repository key of the Federated repository on the remote JPD that serves as the target of the connection."
+                          },
+                          "remotePlatformUrl": {
+                            "type": "string",
+                            "description": "The URL of the Federated repository on the remote JPD."
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "The status of the connection between the source and target members."
+                          },
+                          "lagInMs": {
+                            "type": "integer",
+                            "description": "The current lag (in milliseconds) in synchronizing events between the source and target members."
+                          },
+                          "queuedEvents": {
+                            "type": "integer",
+                            "description": "The number of metadata events remaining in the queue to be sent to the target member."
+                          },
+                          "disabled": {
+                            "type": "boolean",
+                            "description": "Whether the Federation member has been disabled by an administrator."
+                          },
+                          "supported": {
+                            "type": "boolean",
+                            "description": "Whether the Federation member is running a version of Artifactory that supports the standalone Federation service."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Permission Denied"
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ]
+      }
+    }
+  },
+  "tags": []
+}
