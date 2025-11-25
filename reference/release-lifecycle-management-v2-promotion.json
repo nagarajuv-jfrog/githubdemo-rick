@@ -1,0 +1,238 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Release Lifecycle Management - Release Bundle V2 Promotion Apis",
+    "description": "Provides APIs for managing the lifecycle of Release Bundle V2 promotions, including retrieving promoted versions and rolling back promotions.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/lifecycle/api/v2/promotion/{repository_path}": {
+      "get": {
+        "description": "Returns a list of promoted Release Bundle v2 versions that contain the specified artifact.",
+        "parameters": [
+          {
+            "name": "repository_path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The full path of the artifact to search for."
+          },
+          {
+            "name": "project",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Defines the project associated with the Release Bundles. If this parameter is not specified, the default global project is assumed."
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "release_bundle_name",
+                "release_bundle_version",
+                "environment",
+                "created_by"
+              ],
+              "default": "created_by"
+            },
+            "description": "Defines the criterion by which to order the returned records."
+          },
+          {
+            "name": "order_asc",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Defines whether to list the Release Bundle versions in ascending (true) or descending (false) order."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Sets the number of records to skip before returning the query response. Used for pagination purposes."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "maximum": 1000
+            },
+            "description": "Sets the maximum number of records to return at one time. Used for pagination purposes."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetched",
+            "content": {
+              "application/json": {
+                "example": {
+                  "promotions": [
+                    {
+                      "repository_key": "release-bundles-v2",
+                      "release_bundle_name": "ccc",
+                      "release_bundle_version": "1.0.0",
+                      "environment": "DEV",
+                      "created": "2025-01-19T11:02:43.536Z",
+                      "created_millis": 1737284563536,
+                      "created_by": "admin",
+                      "project_key": "default"
+                    },
+                    {
+                      "repository_key": "release-bundles-v2",
+                      "release_bundle_name": "bbb",
+                      "release_bundle_version": "1.0.2",
+                      "environment": "DEV",
+                      "created": "2025-01-19T10:52:30.901Z",
+                      "created_millis": 1737283950901,
+                      "created_by": "admin",
+                      "project_key": "default"
+                    },
+                    {
+                      "repository_key": "release-bundles-v2",
+                      "release_bundle_name": "aaa",
+                      "release_bundle_version": "1.0.3",
+                      "environment": "DEV",
+                      "created": "2025-01-19T10:51:53.394Z",
+                      "created_millis": 1737283913394,
+                      "created_by": "admin",
+                      "project_key": "default"
+                    }
+                  ],
+                  "offset": 3
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (no criteria specified)"
+          },
+          "403": {
+            "description": "Permission Denied"
+          }
+        },
+        "tags": [],
+        "operationId": "getLifecycleApiV2PromotionRepositoryPath"
+      }
+    },
+    "/lifecycle/api/v2/promotion/rollback/{release-bundle-name}/{release-bundle-version}": {
+      "post": {
+        "description": "Removes the latest promotion of a Release Bundle v2 version and restores the version to its previous environment, including the properties and evidence that were present when the version was first created. The contents of the removed promotion, including its artifacts, properties, and evidence, are deleted.",
+        "parameters": [
+          {
+            "name": "from_environment",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name of the current environment in which the Release Bundle version is located. The rollback is executed from this environment."
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "description": "Determines whether the operation should be asynchronous (true) or synchronous (false). When running in asynchronous mode, the timeline shows the rollback as being 'in progress' until the operation completes successfully, fails, or times out. In the meantime, you are free to continue working in Artifactory. When running in synchronous mode, you must wait until the rollback operation completes successfully, fails, or times out."
+          },
+          {
+            "name": "project",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional project key associated with the promotion."
+          },
+          {
+            "name": "release-bundle-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "release-bundle-version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Submitted (Async)",
+            "content": {
+              "application/json": {
+                "example": {
+                  "repository_key": "release-bundles-v2",
+                  "release_bundle_name": "rb1",
+                  "release_bundle_version": "1",
+                  "rollback_from_environment": "PROD",
+                  "rollback_to_environment": "QA"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "repository_key": {
+                      "type": "string",
+                      "description": "Release Bundles repository identifier that identifies where a Release Bundle version resides. The default value is release-bundles-v2."
+                    },
+                    "release_bundle_name": {
+                      "type": "string",
+                      "description": "Release Bundle name"
+                    },
+                    "release_bundle_version": {
+                      "type": "string",
+                      "description": "Release Bundle version"
+                    },
+                    "rollback_from_environment": {
+                      "type": "string",
+                      "description": "The source environment of the promotion to be rolled back."
+                    },
+                    "rollback_to_environment": {
+                      "type": "string",
+                      "description": "The target environment of the rollback."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Deleted (Sync)"
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Permission Denied"
+          }
+        },
+        "security": [],
+        "operationId": "postLifecycleApiV2PromotionRollbackReleaseBundleNameReleaseBundleVersion"
+      }
+    }
+  },
+  "tags": []
+}
