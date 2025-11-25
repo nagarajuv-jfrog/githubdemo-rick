@@ -1,0 +1,529 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Federated Repositories",
+    "version": "1.0.0",
+    "description": "Provides endpoints to manage and monitor Federated repositories in an Artifactory instance. These endpoints facilitate synchronization, migration, and management of repository configurations and tasks."
+  },
+  "paths": {
+    "/artifactory/api/federation/inconsistentRepos": {
+      "get": {
+        "description": "Returns a list of Federated repositories in your local Artifactory instance that have a configuration mismatch with one or more remote members.",
+        "operationId": "getListOfInconsistentFederatedRepositories",
+        "summary": "Get List of Inconsistent Federated Repositories",
+        "responses": {
+          "200": {
+            "description": "A list of Federated repositories with configuration mismatches",
+            "content": {
+              "application/json": {
+                "example": [
+                  "fed82",
+                  "fed-east-r3"
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/federation/migrate/{buildInfoRepoName}": {
+      "post": {
+        "summary": "Convert Build-Info Repository to a Federated Repository",
+        "description": "Converts the Build-Info repository to a federated repository. Once you have converted the build-info repository into a federated Build-Info repository, proceed to add members to the federation using the Update Repository Configuration. Note: The federated repository cannot be converted back to a local Build-Info repository.",
+        "operationId": "convertBuildInfoRepositoryToFederatedRepository",
+        "parameters": [
+          {
+            "name": "buildInfoRepoName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Migration finished successfully",
+            "content": {
+              "application/json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "adminUser": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/federation/propagateCreatedTime": {
+      "put": {
+        "tags": [],
+        "description": "Enables the propagation of artifact creation time metadata during Full Sync operations. This endpoint is relevant when using the Artifactory Federation Service.",
+        "parameters": [
+          {
+            "name": "enabled",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Set to true to enable the propagation of artifact creation time metadata during Full Sync operations."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enabled"
+          },
+          "400": {
+            "description": "Bad Request (missing the enabled query parameter)"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "operationId": "putArtifactoryApiFederationPropagatecreatedtime"
+      }
+    },
+    "/artifactory/api/federation/configSync/{repositoryKey}": {
+      "post": {
+        "tags": [],
+        "summary": "Synchronize Federated Member Configuration",
+        "description": "Synchronizes the configuration of a federated member in case of a network malfunction.",
+        "operationId": "synchronizeFederatedMemberConfiguration",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repositoryKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful synchronization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/federation/binaries/failures/delete": {
+      "delete": {
+        "tags": [],
+        "description": "This API deletes binary tasks that previously failed. This can be done for the entire repository or for a particular binary task in the repository.",
+        "operationId": "deleteFailedBinaryTasks",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name of the repository. This parameter is required."
+          },
+          {
+            "name": "sha1",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The SHA1 of the artifact. This parameter is optional."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deletedTasks": {
+                      "type": "integer",
+                      "description": "The number of deleted binary tasks."
+                    }
+                  }
+                },
+                "example": {
+                  "deletedTasks": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/federation/fullSync/{localRepoName}": {
+      "post": {
+        "description": "Runs a full synchronization between the Federated repository members.",
+        "operationId": "federatedRepositoryFullSync",
+        "parameters": [
+          {
+            "name": "localRepoName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the local repository"
+          },
+          {
+            "name": "mirror",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL of the specific Federation member on which you want to run the Full Sync. If this parameter is not set, the Full Sync is run against all remote Federation members."
+          },
+          {
+            "name": "isDry",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "When set to true, runs the Federation Comparison tool to determine which files on the local member are missing on the remote members. When mirror is set, the comparison is performed against that remote member only."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Full sync triggered successfully"
+          },
+          "default": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
+    "/artifactory/api/federation/forceFullSync/{RepoKey}": {
+      "post": {
+        "summary": "Federated Repository Force Full Sync",
+        "description": "Forces a full synchronization between the Federated repository members, interrupting another Full Sync operation that is already in progress. This can be used if the Full Sync operation in progress has become stuck.",
+        "operationId": "forceFullSync",
+        "parameters": [
+          {
+            "name": "RepoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Full sync triggered successfully",
+            "content": {
+              "application/json": {
+                "example": "Full sync triggered successfully"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/artifactory/api/federation/migrate/{localRepoName}": {
+      "post": {
+        "description": "Converts the local repository to a Federated repository.",
+        "operationId": "convertLocalRepositoryToFederatedRepository",
+        "security": [
+          {
+            "adminUser": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Migration finished successfully.",
+            "content": {
+              "application/json": {
+                "example": "Migration finished successfully."
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "localRepoName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/artifactory/api/federation/convertToLocal": {
+      "post": {
+        "tags": [],
+        "summary": "Convert Federated Repository to a Local Repository",
+        "description": "Converts the specified Federated repository to a local repository. The conversion from Federated back to local is allowed only if the Federated repository is not part of an active Federation containing additional members.",
+        "operationId": "convertFederatedRepositoryToLocal",
+        "parameters": [],
+        "requestBody": {
+          "description": "A comma-separated list of Federated repositories to convert back to local repositories.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "One or more repos converted successfully",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "summary": "All repos converted successfully",
+                    "value": "Successfully converted from federated to local repositories: [repo1, repo2]"
+                  },
+                  "partialSuccess": {
+                    "summary": "Some repos converted successfully",
+                    "value": {
+                      "failedConversionRepositories": {
+                        "repo2": "Repo repo2 contains remote members"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Repos failed to convert",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error": {
+                    "summary": "All repos failed to convert",
+                    "value": {
+                      "failedConversionRepositories": {
+                        "repo2": "Repo repo2 does not exist or is not of Federated type",
+                        "repo1": "Repo repo1 contains remote members"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Permission Denied"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/federation/binaries/failures/replay": {
+      "put": {
+        "tags": [],
+        "summary": "Replay Failed Binary Tasks",
+        "description": "This API marks binary tasks that previously failed to be processed again. This can be done for the entire repository or for a particular binary task in the repository.",
+        "operationId": "replayFailedBinaryTasks",
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name of the repository. This parameter is required."
+          },
+          {
+            "name": "sha1",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The SHA1 of the artifact. This parameter is optional."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "replayTasks": {
+                      "type": "integer",
+                      "description": "The number of replayed binary tasks."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/federation/binaries/failures/list": {
+      "get": {
+        "summary": "Get List of Failed Binary Tasks",
+        "description": "Returns a list of tasks that failed because Artifactory was not able to retrieve the binary of the task. The number of attempts that Artifactory tries to retrieve the binary of the task is set by `maximum`, which is 10 by default.",
+        "operationId": "getListOfFailedBinaryTasks",
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name of the repository. This parameter is required."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1000
+            },
+            "description": "The number of tasks to be returned in the response. Default = 1000. This parameter is optional."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "The page number for a group of tasks, starting from 1. This parameter is optional."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of failed binary tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "sha1": {
+                        "type": "string",
+                        "description": "The SHA1 of the artifact."
+                      },
+                      "repoKey": {
+                        "type": "string",
+                        "description": "The name of the repository."
+                      },
+                      "creationTime": {
+                        "type": "integer",
+                        "description": "The time at which the task was created."
+                      },
+                      "failuresCount": {
+                        "type": "integer",
+                        "description": "The number of times that Artifactory attempted to process the task."
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "sample": {
+                    "summary": "Sample Response",
+                    "value": [
+                      {
+                        "sha1": "5c9449b779eae6c85b5d7b74c4c7d5c2fd0705ae",
+                        "repoKey": "fedrepo",
+                        "creationTime": 1694003288367,
+                        "failuresCount": 10
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": []
+      }
+    }
+  },
+  "tags": []
+}

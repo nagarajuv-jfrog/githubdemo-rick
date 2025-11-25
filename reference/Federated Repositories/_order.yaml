@@ -1,0 +1,11 @@
+- artifactoryapifederationbinariesfailuresdelete
+- artifactoryapifederationbinariesfailureslist
+- artifactoryapifederationbinariesfailuresreplay
+- artifactoryapifederationconfigsyncrepositorykey
+- artifactoryapifederationconverttolocal
+- artifactoryapifederationforcefullsyncrepokey
+- artifactoryapifederationfullsynclocalreponame
+- artifactoryapifederationinconsistentrepos
+- artifactoryapifederationmigratebuildinforeponame
+- artifactoryapifederationmigratelocalreponame
+- artifactoryapifederationpropagatecreatedtime
