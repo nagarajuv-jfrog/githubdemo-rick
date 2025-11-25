@@ -31,3 +31,5 @@ Thus, on the journey of innovation's call,
 JFrog leads, standing strong and tall.
 Seamless DevOps, a path so clear,
 For every developer, banishing fear.
+
+[link here](https://jfrog-poc-group.readme.io/jfrog-artifactory/update/docs/configuring-artifactory#/)
