@@ -1,0 +1,266 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Evidence",
+    "description": "Provides a set of operations for managing evidence files, including deploying, deleting, and retrieving evidence details based on the DSSE framework and in-toto Attestation Framework.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/evidence/api/v1/evidence/{subject-repo-path}/{evidence-name}": {
+      "delete": {
+        "description": "Deletes the specified evidence file and its database record.",
+        "summary": "Delete Evidence",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subject-repo-path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "evidence-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sha256",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "An optional checksum of the evidence file."
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Permission Denied"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "deleteEvidenceApiV1EvidenceSubjectRepoPathEvidenceName"
+      }
+    },
+    "/evidence/api/v1/subject/{subject-repository-path}": {
+      "post": {
+        "tags": [],
+        "summary": "Deploy Evidence",
+        "description": "Deploys an evidence file for the designated subject that complies with the DSSE framework and the in-toto Attestation Framework.",
+        "operationId": "deployEvidence",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "The evidence file to be deployed."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "repository": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "type": "string"
+                    },
+                    "predicate_category": {
+                      "type": "string"
+                    },
+                    "predicate_type": {
+                      "type": "string"
+                    },
+                    "predicate_slug": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "created_by": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "repository": "commons-dev-generic-local",
+                    "path": "commons/1.0.0/file.txt",
+                    "name": "code-review-1717748704938.json",
+                    "uri": "commons-dev-generic-local/.evidence/6899195b7f70e1362509b729a278ee58311b366f38630281c70dfc2ebeb20f4d/69d29925ba75eca8e67e0ad99d1132b47d599c206382049bc230f2edd2d3af30/code-review-1717748704938.json",
+                    "sha256": "cb3ba23a1da137668c03fd609b6fc4c1a35b6fd5cc98cce238465f8170a57a7a",
+                    "predicate_category": "Quality",
+                    "predicate_type": "https://jfrog.com/evidence/code-review/v0.1",
+                    "predicate_slug": "code-review",
+                    "created_at": "2025-01-01T00:00:00.000Z",
+                    "created_by": "admin"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bad Credentials"
+          },
+          "403": {
+            "description": "Permission Denied"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subject-repository-path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The path to the subject repository."
+          }
+        ]
+      }
+    },
+    "/onemodel/api/v1/graphql": {
+      "post": {
+        "tags": [],
+        "summary": "Get Evidence",
+        "description": "Returns the requested data for a single, known evidence file as defined by the One Model GraphQL query. Use the `getEvidence` query when you know the exact location of the evidence file you want to retrieve. This is useful for fetching the details of a specific attestation after you have identified it.",
+        "operationId": "getEvidence",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "example": "query {\n  evidence {\n    getEvidence(\n      repositoryKey: \"my-repo-key\"\n      path: \"path/to/artifact/artifact-name.zip\"\n      name: \"security-scan.json\"\n    ) {\n      predicateType\n      verified\n      predicate\n    }\n  }\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "evidence": {
+                          "type": "object",
+                          "properties": {
+                            "getEvidence": {
+                              "type": "object",
+                              "properties": {
+                                "predicateType": {
+                                  "type": "string"
+                                },
+                                "verified": {
+                                  "type": "boolean"
+                                },
+                                "predicate": {
+                                  "type": "object"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "evidence": {
+                      "getEvidence": {
+                        "predicateType": "https://jfrog.com/evidence/security/scan/v1",
+                        "predicate": {
+                          "scanner": {
+                            "name": "JFrog Xray",
+                            "version": "4.2.0"
+                          },
+                          "summary": {
+                            "critical": 5,
+                            "high": 12,
+                            "medium": 3,
+                            "low": 0
+                          },
+                          "issues": [
+                            {
+                              "cve": "CVE-2023-12345",
+                              "severity": "Critical",
+                              "component": "log4j:log4j:1.2.17"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request failed because the authentication token is invalid or expired."
+          },
+          "403": {
+            "description": "The request failed because the authenticated user does not have the required Read permissions for the subject repository."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "tags": []
+}
