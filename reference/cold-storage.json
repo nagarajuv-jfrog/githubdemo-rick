@@ -1,0 +1,1586 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Cold Storage",
+    "description": "Provides endpoints for managing and interacting with archive policies in Artifactory. This includes creating, previewing, searching, restoring, and converting policies to AQL queries, as well as obtaining policy details and status updates.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/artifactory/api/retention/archive/policies/{key}": {
+      "post": {
+        "tags": [],
+        "summary": "Create an Archive Policy",
+        "description": "Creates a new archive policy in Artifactory using the provided policy configuration.",
+        "operationId": "createArchivePolicy",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique policy key that identifies the policy."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "packageRetention": {
+                    "type": "boolean",
+                    "description": "Determines whether the archive policy works on packages (true) or artifacts (false). Default value is false.",
+                    "default": false
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "Enable/disable policy. If disabled, policy execution is blocked."
+                  },
+                  "cronExp": {
+                    "type": "string",
+                    "description": "The Cron expression for scheduling the policy."
+                  },
+                  "aqlQuery": {
+                    "type": "string",
+                    "description": "Search for artifacts to be archived using Artifactory Query Language (AQL). Required if searchCriteriaForm is not provided."
+                  },
+                  "searchCriteriaForm": {
+                    "type": "string",
+                    "description": "Search Criteria Form for retention policy. Required if aqlQuery is not provided."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description for the policy."
+                  },
+                  "durationInMinutes": {
+                    "type": "integer",
+                    "description": "The maximum duration (in minutes) for policy execution. If policy execution exceeds this period, it is stopped."
+                  },
+                  "expirationTimeInMonths": {
+                    "type": "integer",
+                    "description": "The expiration period (in months) that it takes for archived artifacts to be cleaned up from the Cold instance."
+                  },
+                  "skipTrashcan": {
+                    "type": "boolean",
+                    "description": "Prevent the transfer of the artifacts to the trash can repository, and allow the artifacts to be deleted by a full GC cleanup. Default value is false.",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "packageRetention",
+                  "enabled",
+                  "key",
+                  "cronExp",
+                  "aqlQuery"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "aqlQuery": {
+                      "type": "string"
+                    },
+                    "cronExp": {
+                      "type": "string"
+                    },
+                    "durationInMinutes": {
+                      "type": "integer"
+                    },
+                    "expirationTimeInMonths": {
+                      "type": "integer"
+                    },
+                    "skipTrashcan": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict: If a policy with the specified policyKey already exists, the call fails with a 409 response."
+          }
+        },
+        "security": [
+          {
+            "admin_user": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/retention/archive/policies/preview": {
+      "post": {
+        "description": "Provides an estimated count and total size of archive candidates based on the provided retention policy model.",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "description": "Unique policy key that identifies the policy."
+                  },
+                  "aqlQuery": {
+                    "type": "string",
+                    "description": "Search for artifacts to be archived using Artifactory Query Language (AQL). This can be used instead of `searchCriteriaForm` to include/exclude artifacts in the retention policy."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description for the policy."
+                  },
+                  "cronExp": {
+                    "type": "string",
+                    "description": "The Cron expression for scheduling the policy."
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "Enable/disable policy. If disabled, policy execution is blocked."
+                  },
+                  "expirationTimeInMonths": {
+                    "type": "integer",
+                    "description": "The expiration period (in months) that it takes for archived artifacts to be cleaned up from the Cold instance."
+                  },
+                  "durationInMinutes": {
+                    "type": "integer",
+                    "description": "The maximum duration (in minutes) for policy execution. If policy execution exceeds this period, it is stopped."
+                  },
+                  "nextExecutionTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "skipTrashcan": {
+                    "type": "boolean",
+                    "description": "Prevent the transfer of the artifacts to the trash can repository, and allow the artifacts to be deleted by a full GC cleanup."
+                  },
+                  "packageRetention": {
+                    "type": "boolean",
+                    "description": "Determines whether the archive policy works on packages (`true`) or artifacts (`false`). The default value is `false`."
+                  },
+                  "packageSearchCriteriaForm": {
+                    "type": "object",
+                    "properties": {
+                      "packageType": {
+                        "type": "string",
+                        "description": "The type of package"
+                      },
+                      "packageRepos": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "A list of repositories to which the policy applies"
+                      },
+                      "componentName": {
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "key",
+                  "packageRetention",
+                  "packageType",
+                  "packageRepos"
+                ]
+              },
+              "example": {
+                "key": "dfsdf",
+                "aqlQuery": "",
+                "description": "",
+                "cronExp": "",
+                "enabled": true,
+                "expirationTimeInMonths": 0,
+                "durationInMinutes": 0,
+                "nextExecutionTime": null,
+                "skipTrashcan": false,
+                "packageRetention": true,
+                "packageSearchCriteriaForm": {
+                  "packageType": "generic",
+                  "packageRepos": [
+                    "example-repo-local"
+                  ],
+                  "componentName": "",
+                  "version": ""
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "description": "Archive candidates count"
+                    },
+                    "totalSize": {
+                      "type": "integer",
+                      "description": "Total size in bytes"
+                    }
+                  },
+                  "example": {
+                    "count": 10,
+                    "totalSize": 80
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postArtifactoryApiRetentionArchivePoliciesPreview"
+      }
+    },
+    "/artifactory/api/retention/archive/policies/{key}/preview": {
+      "post": {
+        "tags": [],
+        "summary": "Preview Retention Policy by Policy Key",
+        "description": "Provides an estimated count and total size of archive candidates based on the provided retention policy key. This Cold Storage feature is available only for Artifactory Enterprise and Enterprise+ users.",
+        "operationId": "previewRetentionPolicyByPolicyKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "description": "The policy key for which you want to get a preview.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "description": "Archive candidates count"
+                    },
+                    "totalSize": {
+                      "type": "integer",
+                      "description": "Total size in bytes"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/retention/searchPackages": {
+      "post": {
+        "tags": [],
+        "summary": "Search for Package Archives",
+        "description": "Search for archived artifacts based on AQL query.",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "packageType": {
+                    "type": "string",
+                    "description": "The package type to search for (for example, Docker)."
+                  },
+                  "repositories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "The repositories to include in the search results."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The package name pattern to include in the search results."
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "The package version to include in the search results."
+                  },
+                  "archiveTimeFrom": {
+                    "type": "string",
+                    "description": "The earliest archive time to include in the search results."
+                  },
+                  "archiveTimeTo": {
+                    "type": "string",
+                    "description": "The latest archive time to include in the search results."
+                  }
+                }
+              },
+              "examples": {
+                "example-1": {
+                  "value": {
+                    "packageType": "docker",
+                    "repositories": [
+                      "docker-local"
+                    ],
+                    "name": "*"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completed",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "results": [
+                        {
+                          "manifestName": "base-java11-2022.10.6-1684150761917.json",
+                          "packageType": "docker",
+                          "packageName": "bases/base-java11",
+                          "version": "2022.10.6",
+                          "originalRepository": "package-local-to-local-repo-5594",
+                          "archivingTime": 1684150761917
+                        }
+                      ],
+                      "range": {
+                        "start_pos": 0,
+                        "end_pos": 1,
+                        "total": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "operationId": "SearchforPackageArchives"
+      }
+    },
+    "/artifactory/api/retention/search": {
+      "post": {
+        "tags": [],
+        "summary": "Search for Archives",
+        "description": "Search for archived artifacts based on AQL query.",
+        "operationId": "searchForArchives",
+        "requestBody": {
+          "description": "AQL query for searching archived artifacts",
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              },
+              "example": "items.find({\"repo\": \"myRepo\"}).include(\"property\")"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "repo": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          },
+                          "created": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "created_by": {
+                            "type": "string"
+                          },
+                          "modified": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "modified_by": {
+                            "type": "string"
+                          },
+                          "updated": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "properties": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "range": {
+                      "type": "object",
+                      "properties": {
+                        "start_pos": {
+                          "type": "integer"
+                        },
+                        "end_pos": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "results": [
+                    {
+                      "repo": "myRepo",
+                      "path": ".",
+                      "name": "artifactory.20210507233800.td",
+                      "type": "file",
+                      "size": 145149,
+                      "created": "2021-06-30T10:27:01.866Z",
+                      "created_by": "admin",
+                      "modified": "2021-06-30T10:27:00.414Z",
+                      "modified_by": "admin",
+                      "updated": "2021-06-30T10:29:06.139Z",
+                      "properties": [
+                        {
+                          "key": "artifact.lifecycle.archive.time",
+                          "value": "1625048946037"
+                        }
+                      ]
+                    }
+                  ],
+                  "range": {
+                    "start_pos": 0,
+                    "end_pos": 1,
+                    "total": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/retention/restore": {
+      "post": {
+        "tags": [],
+        "summary": "Restore from Archive",
+        "description": "Triggers restoration of multiple items from the Archive. An admin can choose one of the following options:\n\n- Restore items to the original location and provide fallback repository in case the original location was deprecated.\n- Restore to a dedicated central repository.\n\n**Important:** Restore operation only moves the items back to the Warm instance location and does not delete them from the Cold instance.\n\n**Note:** This Cold Storage feature is available only for Artifactory Enterprise and Enterprise+ users.\n\n**Since:** Artifactory 7.27.3\n\n**Security:** Requires an admin user",
+        "requestBody": {
+          "description": "Request payload for restoring items",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "restoreType": {
+                    "type": "string",
+                    "description": "Determines whether to restore a package (PACKAGE_RESTORE) or artifacts (ARTIFACT_RESTORE). The default value is ARTIFACT_RESTORE.",
+                    "default": "ARTIFACT_RESTORE"
+                  },
+                  "restoreToOriginal": {
+                    "type": "boolean",
+                    "description": "Set whether or not to restore to the original artifact location (saved on the Cold instance).",
+                    "nullable": true
+                  },
+                  "fallbackDestinationPath": {
+                    "type": "string",
+                    "description": "If restoreToOriginal is set as true and the original location does not exist anymore, restore to this fallback location. fallbackDestinationPath must contain at least the repository key.",
+                    "nullable": true
+                  },
+                  "centralDestinationPath": {
+                    "type": "string",
+                    "description": "The repository key where the files need to be restored. The files will be restored to this repository according to its original path hierarchy. centralDestinationPath and restoreToOriginal are mutually exclusive.",
+                    "nullable": true
+                  },
+                  "addNamespace": {
+                    "type": "boolean",
+                    "description": "This is set as true by default and you do not have to include the namespace when adding items for itemsToRestore. When set as false, you must include the namespace when adding items for itemsToRestore.",
+                    "default": true
+                  },
+                  "itemsToRestore": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Comma-separated list of the items or paths to be restored. Folder paths must end with a '/' while file paths must not."
+                  }
+                },
+                "required": [
+                  "restoreType",
+                  "itemsToRestore"
+                ]
+              },
+              "examples": {
+                "Restoring artifacts": {
+                  "value": {
+                    "restoreType": "ARTIFACT_RESTORE",
+                    "restoreToOriginal": false,
+                    "fallbackDestinationPath": "",
+                    "centralDestinationPath": "3750-artifacts",
+                    "itemsToRestore": []
+                  }
+                },
+                "Restoring packages": {
+                  "value": {
+                    "restoreType": "PACKAGE_RESTORE",
+                    "restoreToOriginal": false,
+                    "fallbackDestinationPath": "",
+                    "centralDestinationPath": "nir",
+                    "itemsToRestore": [
+                      "docker-local/docker-alpine-tag-11003.json",
+                      "docker-local/docker-alpine-tag-11004.json",
+                      "docker-local/docker-alpine-tag-11005.json",
+                      "docker-local/docker-alpine-tag-11012.json",
+                      "docker-local/docker-alpine-tag-11014.json",
+                      "docker-local/docker-alpine-tag-11017.json",
+                      "docker-local/docker-alpine-tag-11026.json",
+                      "docker-local/docker-alpine-tag-11034.json",
+                      "docker-local/docker-alpine-tag-11038.json",
+                      "docker-local/docker-alpine-tag-11045.json",
+                      "docker-local/docker-alpine-tag-11999.json"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "packages": {
+                    "value": {
+                      "response": "Restore process was initialized successfully.",
+                      "restore_operation_id": "retention_restore_package_AL8VPOK4EW"
+                    }
+                  },
+                  "artifacts": {
+                    "value": {
+                      "response": "Restore process was initialized successfully.",
+                      "restore_operation_id": "retention_restore_artifact_FVRU5YWVRU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "RestorefromArchive"
+      }
+    },
+    "/api/retention/archive/policies/convertToAql": {
+      "post": {
+        "tags": [],
+        "summary": "Convert Search Criteria Form to AQL",
+        "description": "Generates an AQL query according to the given search criteria form. The generated AQL query can then be used to perform a search.",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "properties": {
+                    "type": "object",
+                    "description": "Include/Exclude all properties with the specified “propertyKey” and a single “propertyValue”. Supports and/or operator.",
+                    "example": {
+                      "include": {
+                        "operator": "or",
+                        "values": [
+                          {
+                            "propertyKey": "example-prop-key-1",
+                            "propertyValue": "prop-val-1"
+                          },
+                          {
+                            "propertyKey": "example-prop-key-1",
+                            "propertyValue": "prop-val-2"
+                          }
+                        ]
+                      },
+                      "exclude": {
+                        "operator": "or",
+                        "values": [
+                          {
+                            "propertyKey": "example-prop-key-2",
+                            "propertyValue": "prop-val-1"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "repositories": {
+                    "type": "object",
+                    "description": "Include/Exclude all repository keys. Supports and/or operator.",
+                    "example": {
+                      "include": {
+                        "operator": "or",
+                        "values": [
+                          "repo-1",
+                          "repo-2"
+                        ]
+                      },
+                      "exclude": {
+                        "operator": "and",
+                        "values": [
+                          "repo-*",
+                          "*-3"
+                        ]
+                      }
+                    }
+                  },
+                  "paths": {
+                    "type": "object",
+                    "description": "Include/Exclude all items with specified paths. Supports and/or operator.",
+                    "example": {
+                      "include": {
+                        "operator": "or",
+                        "values": [
+                          "path-1",
+                          "path-2"
+                        ]
+                      },
+                      "exclude": {
+                        "operator": "or",
+                        "values": [
+                          "path-3"
+                        ]
+                      }
+                    }
+                  },
+                  "names": {
+                    "type": "object",
+                    "description": "Include/Exclude all items with the specified names. Supports and/or operator.",
+                    "example": {
+                      "include": {
+                        "operator": "or",
+                        "values": [
+                          "name-1",
+                          "name-2"
+                        ]
+                      },
+                      "exclude": {
+                        "operator": "or",
+                        "values": [
+                          "name-3"
+                        ]
+                      }
+                    }
+                  },
+                  "createdBefore": {
+                    "type": "integer",
+                    "description": "Include all items that were created before the time provided (in months)"
+                  },
+                  "downloadedBefore": {
+                    "type": "integer",
+                    "description": "Include all items that were last downloaded before the time provided (in months)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "example": "items.find(\n  {\n    \"$and\": [\n        {\n            \"$or\": [\n                {\n                    \"@example-prop-key-1\": {\n                        \"$match\": \"prop-val-1\"\n                    }\n                },\n                {\n                    \"@example-prop-key-1\": {\n                        \"$match\": \"prop-val-2\"\n                    }\n                }\n            ]\n        },\n        {\n            \"$or\": [\n                {\n                    \"@example-prop-key-2\": {\n                        \"$nmatch\": \"prop-val-1\"\n                    }\n                }\n            ]\n        },\n        {\n            \"$or\": [\n                {\n                    \"repo\": {\n                        \"$match\": \"repo-1\"\n                    }\n                },\n                {\n                    \"repo\": {\n                        \"$match\": \"repo-2\"\n                    }\n                }\n            ]\n        },\n        {\n            \"$and\": [\n                {\n                    \"repo\": {\n                        \"$nmatch\": \"repo-*\"\n                    }\n                },\n                {\n                    \"repo\": {\n                        \"$nmatch\": \"*-3\"\n                    }\n                }\n            ]\n        },\n        {\n            \"$or\": [\n                {\n                    \"path\": {\n                        \"$match\": \"path-1\"\n                    }\n                },\n                {\n                    \"path\": {\n                        \"$match\": \"path-2\"\n                    }\n                }\n            ]\n        },\n        {\n            \"$or\": [\n                {\n                    \"path\": {\n                        \"$nmatch\": \"path-3\"\n                    }\n                }\n            ]\n        },\n        {\n            \"$or\": [\n                {\n                    \"name\": {\n                        \"$match\": \"name-1\"\n                    }\n                },\n                {\n                    \"name\": {\n                        \"$match\": \"name-2\"\n                    }\n                }\n            ]\n        },\n        {\n            \"$or\": [\n                {\n                    \"name\": {\n                        \"$nmatch\": \"name-3\"\n                    }\n                }\n            ]\n        },\n        {\n            \"created\": {\n                \"$lt\": \"1628668945\"\n            }\n        },\n        {\n            \"stat.downloaded\": {\n                \"$lt\": \"1628668945\"\n            }\n        }\n    ]\n}\n)"
+              }
+            }
+          }
+        },
+        "operationId": "ConvertSearchCriteriaFormtoAQL"
+      }
+    },
+    "/artifactory/api/retention/archive/policies/{policyKey}": {
+      "get": {
+        "tags": [],
+        "summary": "Get an Archive Policy",
+        "description": "Returns an archive policy based on the policy key.",
+        "operationId": "getArchivePolicy",
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "policyKey",
+            "in": "path",
+            "required": true,
+            "description": "The policy key for which the archive policy details need to be retrieved.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "description": "Unique policy key that identifies the policy."
+                      },
+                      "enabled": {
+                        "type": "boolean",
+                        "description": "If the policy is enabled/disabled for execution."
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Description for the policy."
+                      },
+                      "cronExp": {
+                        "type": "string",
+                        "description": "The Cron expression used for scheduling the archive policy."
+                      },
+                      "durationInMinutes": {
+                        "type": "integer",
+                        "description": "The maximum duration (in minutes) for policy execution."
+                      },
+                      "expirationTimeInMonths": {
+                        "type": "integer",
+                        "description": "The expiration period (in months) that it takes for archived artifacts to be cleaned up from the Cold instance."
+                      },
+                      "skipTrashcan": {
+                        "type": "boolean",
+                        "description": "If the transfer of the artifacts to the trash can repository is enabled or disabled."
+                      },
+                      "searchCriteriaForm": {
+                        "type": "object",
+                        "properties": {
+                          "properties": {
+                            "type": "object",
+                            "properties": {
+                              "include": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "propertyKey": {
+                                          "type": "string"
+                                        },
+                                        "propertyValue": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "exclude": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "repositories": {
+                            "type": "object",
+                            "properties": {
+                              "include": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "exclude": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "paths": {
+                            "type": "object",
+                            "properties": {
+                              "include": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "exclude": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "createdBefore": {
+                            "type": "integer"
+                          },
+                          "downloadedBefore": {
+                            "type": "integer"
+                          }
+                        }
+                      },
+                      "lastRunStatus": {
+                        "type": "object",
+                        "properties": {
+                          "migrationIdentifier": {
+                            "type": "string"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "completedNumberOfArtifacts": {
+                            "type": "integer"
+                          },
+                          "failedNumberOfArtifacts": {
+                            "type": "integer"
+                          },
+                          "totalNumberOfArtifacts": {
+                            "type": "integer"
+                          },
+                          "progressPercentage": {
+                            "type": "integer"
+                          },
+                          "startTime": {
+                            "type": "integer"
+                          },
+                          "finishTime": {
+                            "type": "integer"
+                          },
+                          "totalByteSize": {
+                            "type": "integer"
+                          },
+                          "successByteSize": {
+                            "type": "integer"
+                          },
+                          "failureByteSize": {
+                            "type": "integer"
+                          },
+                          "triggeredBy": {
+                            "type": "string"
+                          },
+                          "policyName": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "nextExecutionTime": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/retention/restore/executions": {
+      "get": {
+        "tags": [],
+        "summary": "Get Restore Process Status",
+        "description": "Returns the status of the restore process based on the specified duration and policy key.",
+        "operationId": "getRestoreProcessStatus",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The date range (in epoch format) for the restore status.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "The date range (in epoch format) for the restore status.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string"
+                    },
+                    "completedNumberOfArtifacts": {
+                      "type": "integer"
+                    },
+                    "failedNumberOfArtifacts": {
+                      "type": "integer"
+                    },
+                    "totalNumberOfArtifacts": {
+                      "type": "integer"
+                    },
+                    "progressPercentage": {
+                      "type": "integer"
+                    },
+                    "startTime": {
+                      "type": "integer"
+                    },
+                    "finishTime": {
+                      "type": "integer"
+                    },
+                    "totalByteSize": {
+                      "type": "integer"
+                    },
+                    "successByteSize": {
+                      "type": "integer"
+                    },
+                    "failureByteSize": {
+                      "type": "integer"
+                    },
+                    "destination": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/retention/archive/policies": {
+      "get": {
+        "tags": [],
+        "summary": "Get All Archive Policies",
+        "description": "Returns a list of all available archive policies.\n\nNote: This Cold Storage feature is available only for Artifactory Enterprise and Enterprise+ users.\n\nSince: Artifactory 7.27.3\n\nSecurity: Requires an admin user",
+        "operationId": "getAllArchivePolicies",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "myPolicy": {
+                    "value": {
+                      "key": "myPolicy",
+                      "enabled": false,
+                      "description": "Demo policy - archive using search criteria form",
+                      "durationInMinutes": 0,
+                      "expirationTimeInMonths": 0,
+                      "skipTrashcan": false,
+                      "searchCriteriaForm": {
+                        "properties": {
+                          "include": {
+                            "operator": "or",
+                            "values": [
+                              {
+                                "propertyKey": "updated",
+                                "propertyValue": "updated"
+                              }
+                            ]
+                          },
+                          "exclude": {
+                            "operator": "or",
+                            "values": []
+                          }
+                        },
+                        "repositories": {
+                          "include": {
+                            "operator": "or",
+                            "values": [
+                              "include-*",
+                              "*-repo"
+                            ]
+                          },
+                          "exclude": {
+                            "operator": "or",
+                            "values": []
+                          }
+                        },
+                        "paths": {
+                          "include": {
+                            "operator": "or",
+                            "values": []
+                          },
+                          "exclude": {
+                            "operator": "or",
+                            "values": [
+                              "exclude-*",
+                              "*-path"
+                            ]
+                          }
+                        },
+                        "createdBefore": 2,
+                        "downloadedBefore": 3
+                      },
+                      "lastRunStatus": {
+                        "migrationIdentifier": "retention_archive_myPolicy2_OUYEVKCIO3",
+                        "state": "COMPLETE",
+                        "completedNumberOfArtifacts": 0,
+                        "failedNumberOfArtifacts": 0,
+                        "totalNumberOfArtifacts": 0,
+                        "progressPercentage": 0,
+                        "startTime": 1632915823313,
+                        "finishTime": 1632915823355,
+                        "totalByteSize": 0,
+                        "successByteSize": 0,
+                        "failureByteSize": 0,
+                        "triggeredBy": "admin",
+                        "policyName": "myPolicy"
+                      }
+                    }
+                  },
+                  "myPolicy2": {
+                    "value": {
+                      "key": "myPolicy2",
+                      "enabled": true,
+                      "description": "Demo policy - archive using search criteria form",
+                      "cronExp": "0 0 0/1 ? * * *",
+                      "durationInMinutes": 0,
+                      "expirationTimeInMonths": 0,
+                      "skipTrashcan": false,
+                      "searchCriteriaForm": {
+                        "properties": {
+                          "include": {
+                            "operator": "or",
+                            "values": [
+                              {
+                                "propertyKey": "updated",
+                                "propertyValue": "updated"
+                              }
+                            ]
+                          },
+                          "exclude": {
+                            "operator": "or",
+                            "values": []
+                          }
+                        },
+                        "repositories": {
+                          "include": {
+                            "operator": "or",
+                            "values": [
+                              "include-*",
+                              "*-repo"
+                            ]
+                          },
+                          "exclude": {
+                            "operator": "or",
+                            "values": []
+                          }
+                        },
+                        "paths": {
+                          "include": {
+                            "operator": "or",
+                            "values": []
+                          },
+                          "exclude": {
+                            "operator": "or",
+                            "values": [
+                              "exclude-*",
+                              "*-path"
+                            ]
+                          }
+                        },
+                        "createdBefore": 2,
+                        "downloadedBefore": 3
+                      },
+                      "lastRunStatus": {
+                        "migrationIdentifier": "retention_archive_myPolicy2_OUYEVKCIO3",
+                        "state": "COMPLETE",
+                        "completedNumberOfArtifacts": 0,
+                        "failedNumberOfArtifacts": 0,
+                        "totalNumberOfArtifacts": 0,
+                        "progressPercentage": 0,
+                        "startTime": 1632915823313,
+                        "finishTime": 1632915823355,
+                        "totalByteSize": 0,
+                        "successByteSize": 0,
+                        "failureByteSize": 0,
+                        "triggeredBy": "admin",
+                        "policyName": "myPolicy2"
+                      },
+                      "nextExecutionTime": 1632916800000
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "description": "Unique policy key that identifies the policy."
+                      },
+                      "enabled": {
+                        "type": "boolean",
+                        "description": "If the policy is enabled/disabled for execution."
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Description for the policy."
+                      },
+                      "cronExp": {
+                        "type": "string",
+                        "description": "The Cron expression is used for scheduling the archive policy."
+                      },
+                      "nextExecutionTime": {
+                        "type": "integer",
+                        "description": "Time when the policy is scheduled to run next. This depends on the cronExp and the previous execution time."
+                      },
+                      "durationInMinutes": {
+                        "type": "integer",
+                        "description": "The maximum duration (in minutes) for policy execution."
+                      },
+                      "lastRunStatus": {
+                        "type": "object",
+                        "properties": {
+                          "migrationIdentifier": {
+                            "type": "string",
+                            "description": "Identifier for the migration."
+                          },
+                          "state": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "IN_PROGRESS",
+                              "IN_PROGRESS_WITH_ERRORS",
+                              "COMPLETE",
+                              "COMPLETE_WITH_ERRORS",
+                              "FAILED"
+                            ],
+                            "description": "Shows the status of the last policy run."
+                          },
+                          "completedNumberOfArtifacts": {
+                            "type": "integer",
+                            "description": "Total number of artifacts that were successfully archived."
+                          },
+                          "failedNumberOfArtifacts": {
+                            "type": "integer",
+                            "description": "Total number of artifacts that could not be archived."
+                          },
+                          "totalNumberOfArtifacts": {
+                            "type": "integer",
+                            "description": "Total number of artifacts to be archived."
+                          },
+                          "progressPercentage": {
+                            "type": "integer",
+                            "description": "The progress of the archive policy (in percentage)."
+                          },
+                          "startTime": {
+                            "type": "integer",
+                            "description": "Time when the policy started executing. Value is in Unix epoch time in milliseconds."
+                          },
+                          "finishTime": {
+                            "type": "integer",
+                            "description": "Time when the policy finished executing. Value is in Unix epoch time in milliseconds."
+                          },
+                          "totalByteSize": {
+                            "type": "integer",
+                            "description": "The total size of the artifacts included in the policy."
+                          },
+                          "successByteSize": {
+                            "type": "integer",
+                            "description": "The size of the artifacts that were archived."
+                          },
+                          "failureByteSize": {
+                            "type": "integer",
+                            "description": "The size of the artifacts that couldn't be archived."
+                          },
+                          "triggeredBy": {
+                            "type": "string",
+                            "description": "The user who triggered the policy."
+                          },
+                          "policyName": {
+                            "type": "string",
+                            "description": "Name of the policy."
+                          }
+                        }
+                      },
+                      "expirationTimeInMonths": {
+                        "type": "integer",
+                        "description": "The expiration period (in months) that it takes for archived artifacts to be cleaned up from the Cold instance."
+                      },
+                      "skipTrashcan": {
+                        "type": "boolean",
+                        "description": "If the transfer of the artifacts to the Trash Can repository is enabled or disabled."
+                      },
+                      "searchCriteriaForm": {
+                        "type": "object",
+                        "properties": {
+                          "properties": {
+                            "type": "object",
+                            "properties": {
+                              "include": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "propertyKey": {
+                                          "type": "string"
+                                        },
+                                        "propertyValue": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "exclude": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "propertyKey": {
+                                          "type": "string"
+                                        },
+                                        "propertyValue": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "repositories": {
+                            "type": "object",
+                            "properties": {
+                              "include": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "exclude": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "paths": {
+                            "type": "object",
+                            "properties": {
+                              "include": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "exclude": {
+                                "type": "object",
+                                "properties": {
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "createdBefore": {
+                            "type": "integer"
+                          },
+                          "downloadedBefore": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/retention/archive/policies/{key}/stop": {
+      "post": {
+        "tags": [],
+        "summary": "Stop Policy Execution",
+        "description": "Stops the execution of an archive policy based on the policy key.",
+        "operationId": "stopPolicyExecution",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "description": "Unique policy key that identifies the policy to be stopped.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          }
+        }
+      }
+    },
+    "/artifactory/api/retention/archive/policies/{key}/trigger": {
+      "post": {
+        "description": "Runs an archive policy based on the provided policy key.",
+        "summary": "Run an Archive Policy",
+        "operationId": "runArchivePolicy",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Key of the policy that needs to be run."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "example": "Retention policy ‘example-policy-key’ execution request has been accepted for processing."
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "x-since": "Artifactory 7.27.3",
+        "x-note": "This Cold Storage feature is available only for Artifactory Enterprise and Enterprise+ users."
+      }
+    },
+    "/artifactory/api/retention/namespace": {
+      "get": {
+        "description": "Get the namespace that was generated for all the repositories during the archive process. This namespace is required when sending a request for restoring artifacts.",
+        "operationId": "getNamespace",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jfrogColdStorageNamespaceId": {
+                      "type": "string",
+                      "example": "gbbxmcuj"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": []
+      }
+    }
+  },
+  "tags": []
+}
