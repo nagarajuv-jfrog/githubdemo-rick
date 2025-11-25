@@ -1,0 +1,11 @@
+- apireplicationsrcrepokeysrcpath
+- artifactoryapireplicationexecuterepopath
+- artifactoryapireplicationrepokey
+- artifactoryapireplicationschannelsrelease
+- artifactoryapireplicationschannelsrepo
+- artifactoryapireplicationsenable-disable
+- artifactoryapireplicationsmultiplerepo-key
+- artifactoryapireplicationsrepokey
+- artifactoryapisystemreplications
+- artifactoryapisystemreplicationsblock
+- artifactoryapisystemreplicationsunblock

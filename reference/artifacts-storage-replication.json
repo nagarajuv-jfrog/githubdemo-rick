@@ -1,0 +1,713 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Artifacts Storage - Repository Replication Apis",
+    "description": "APIs for managing and monitoring repository replications in Artifactory, including configurations, executions, and status checks. These endpoints support various replication types such as scheduled, event-based, and immediate content replication. Requires appropriate permissions and Artifactory Pro.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/artifactory/api/replication/{repoKey}": {
+      "get": {
+        "tags": [],
+        "summary": "Scheduled Replication Status",
+        "description": "Returns the status of scheduled cron-based replication jobs defined in Artifactory. Supported by local, local-cached, and remote repositories. The status is returned on two levels, per replication job and per repository containing the replication jobs. Requires Artifactory Pro. Requires a user with 'read' permission (can be anonymous).",
+        "operationId": "getScheduledReplicationStatus",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "The key of the repository for which to return the replication status",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the replication status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The status of the replication",
+                      "enum": [
+                        "never_run",
+                        "incomplete",
+                        "error",
+                        "warn",
+                        "ok",
+                        "inconsistent"
+                      ]
+                    },
+                    "lastCompleted": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "The time the replication last completed in ISO8601 format"
+                    },
+                    "targets": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "url": {
+                            "type": "string",
+                            "description": "The URL of the target repository"
+                          },
+                          "repoKey": {
+                            "type": "string",
+                            "description": "The key of the target repository"
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "The status of the replication for the target repository",
+                            "enum": [
+                              "never_run",
+                              "incomplete",
+                              "error",
+                              "warn",
+                              "ok",
+                              "inconsistent"
+                            ]
+                          },
+                          "lastCompleted": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "The time the replication last completed for the target repository in ISO8601 format"
+                          }
+                        }
+                      }
+                    },
+                    "repositories": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "The status of the replication for the repository",
+                            "enum": [
+                              "never_run",
+                              "incomplete",
+                              "error",
+                              "warn",
+                              "ok",
+                              "inconsistent"
+                            ]
+                          },
+                          "lastCompleted": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "The time the replication last completed for the repository in ISO8601 format"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/replications/channels/release": {
+      "post": {
+        "summary": "Close all event based pull replication subscribed channels",
+        "description": "Close the connection of all the event based pull replication instances subscribed to this Artifactory, which force them to try to reopen connection.",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "operationId": "Closealleventbasedpullreplicationsubscribedchannels",
+        "parameters": []
+      }
+    },
+    "/artifactory/api/replications/{repoKey}": {
+      "post": {
+        "description": "Update existing replication configuration for given repository key, if found. Supported by local and remote repositories.",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "example": "http://localhost:8081/artifactory/remote-repo"
+                  },
+                  "socketTimeoutMillis": {
+                    "type": "integer",
+                    "example": 15000
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "admin"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password"
+                  },
+                  "enableEventReplication": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "cronExp": {
+                    "type": "string",
+                    "example": "0 0 12 * * ?"
+                  },
+                  "syncDeletes": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "syncProperties": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "syncStatistics": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "repoKey": {
+                    "type": "string",
+                    "example": "libs-release-local"
+                  },
+                  "includePathPrefixPattern": {
+                    "type": "string",
+                    "example": "/path/to/repo"
+                  },
+                  "excludePathPrefixPattern": {
+                    "type": "string",
+                    "example": "/path/to/repo"
+                  },
+                  "checkBinaryExistenceInFilestore": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                },
+                "required": [
+                  "url",
+                  "username",
+                  "password",
+                  "repoKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Repository key not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "postArtifactoryApiReplicationsRepokey"
+      }
+    },
+    "/artifactory/api/system/replications/unblock": {
+      "post": {
+        "description": "Unblocks replications globally. Push and pull are true by default. If false, replication for the corresponding type is not unblocked.",
+        "security": [
+          {
+            "adminUser": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "push",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "pull",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully unblocked all replications",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postArtifactoryApiSystemReplicationsUnblock"
+      }
+    },
+    "/artifactory/api/replications/multiple/{repo-key}": {
+      "post": {
+        "tags": [],
+        "summary": "Update Local Multi-push Replication",
+        "description": "Updates a local multi-push replication configuration. Supported by local repositories.",
+        "operationId": "updateLocalMultiPushReplication",
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            },
+            "application/vnd.org.jfrog.artifactory.replications.MultipleReplicationConfigRequest+json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/artifactory/api/replication/execute/{repoPath}": {
+      "post": {
+        "description": "Schedules immediate content replication between two Artifactory instances. Replication can optionally include properties and delete items if they do not exist in the source repository. This API completes the existing cron-based replication exposed via the Artifactory UI and allows for pre-scheduled execution.",
+        "operationId": "executeReplication",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "description": "URL of the repository at the remote Artifactory instance, used only by push replication"
+                    },
+                    "username": {
+                      "type": "string",
+                      "description": "Username at the remote Artifactory instance, used only by push replication"
+                    },
+                    "password": {
+                      "type": "string",
+                      "description": "Password at the remote Artifactory instance, used only by push replication"
+                    },
+                    "proxy": {
+                      "type": "string",
+                      "description": "Name of the proxy (if used) at the remote Artifactory instance, used only by push replication"
+                    },
+                    "properties": {
+                      "type": "boolean",
+                      "description": "When true, properties of replicated artifacts will be synchronized also"
+                    },
+                    "delete": {
+                      "type": "boolean",
+                      "description": "When true, items that were deleted remotely will also be deleted locally (including properties metadata)"
+                    },
+                    "checkBinaryExistenceInFilestore": {
+                      "type": "boolean",
+                      "description": "When true, enables distributed checksum storage. Requires an Enterprise+ license."
+                    }
+                  },
+                  "required": [
+                    "url",
+                    "username",
+                    "password"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replication executed successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "privileged_user": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoPath",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/artifactory/api/system/replications": {
+      "get": {
+        "description": "Returns the global system replication configuration status, i.e. if push and pull replications are blocked or unblocked.",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "blockPullReplications": {
+                      "type": "boolean"
+                    },
+                    "blockPushReplications": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": {
+                    "blockPullReplications": false,
+                    "blockPushReplications": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "operationId": "getArtifactoryApiSystemReplications"
+      }
+    },
+    "/artifactory/api/replications/channels/{repo}": {
+      "get": {
+        "description": "This endpoint, which is run against a local repository, returns a list of all the instances subscribed for event-based pull replication by a remote repository.",
+        "operationId": "getRemoteRepositoriesRegisteredForReplication",
+        "parameters": [
+          {
+            "name": "repo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminUser": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/replications/{enable | disable}": {
+      "post": {
+        "summary": "Enable or Disable Multiple Replications",
+        "description": "Enables/disables multiple replication tasks by repository or Artifactory server based on include and exclude patterns where include and exclude patterns should be target repository URLs.",
+        "security": [
+          {
+            "privilegedUser": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "include": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "exclude": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "examples": {
+                "example1": {
+                  "summary": "Enable/disable all push replications except those going out to http://artimaster:port/artifactory and https://somearti:port/artifactory/local-repo.",
+                  "value": {
+                    "include": [
+                      "**"
+                    ],
+                    "exclude": [
+                      "http://artimaster:port/artifactory/**",
+                      "https://somearti:port/artifactory/local-repo"
+                    ]
+                  }
+                },
+                "example2": {
+                  "summary": "Enable/disable all push replications except those going out to http://artidr:port/artifactory.",
+                  "value": {
+                    "include": [
+                      "**"
+                    ],
+                    "exclude": [
+                      "http://artidr:port/artifactory/**"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        },
+        "operationId": "EnableorDisableMultipleReplications",
+        "parameters": [
+          {
+            "name": "enable | disable",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/replication/{srcRepoKey}/{srcPath}": {
+      "post": {
+        "tags": [],
+        "summary": "Schedules immediate content replication between two Artifactory instances.",
+        "description": "Replication can include properties and can optionally delete local items if they do not exist in the source repository. Pulls content from a remote Artifactory repository to a local cache of the remote repository. Pushes content from a local repository into a remote Artifactory local repository.",
+        "operationId": "scheduleReplication",
+        "parameters": [
+          {
+            "name": "srcRepoKey",
+            "in": "path",
+            "required": true,
+            "description": "The source repository key.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "srcPath",
+            "in": "path",
+            "required": true,
+            "description": "The source path within the repository.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "description": "The remote repository URL"
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "The name of a user with deploy permissions on the remote repository"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The remote repository password"
+                  },
+                  "properties": {
+                    "type": "boolean",
+                    "description": "Sync item properties (true by default)"
+                  },
+                  "delete": {
+                    "type": "boolean",
+                    "description": "Sync deletions (false by default)"
+                  },
+                  "proxy": {
+                    "type": "string",
+                    "description": "A name of an Artifactory-configured proxy to use for remote requests"
+                  }
+                },
+                "required": [
+                  "url",
+                  "username",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replication scheduled successfully."
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Unauthorized request."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "deprecated": true
+      }
+    },
+    "/artifactory/api/system/replications/block": {
+      "post": {
+        "description": "Blocks replications globally. Push and pull are true by default. If false, replication for the corresponding type is not blocked. Requires Artifactory Pro",
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "push",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, push replication is blocked."
+          },
+          {
+            "name": "pull",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, pull replication is blocked."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully blocked all replications, no replication will be triggered.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postArtifactoryApiSystemReplicationsBlock"
+      }
+    }
+  },
+  "tags": []
+}
