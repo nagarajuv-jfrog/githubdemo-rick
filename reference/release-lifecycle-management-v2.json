@@ -1,0 +1,325 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Release Lifecycle Management - Release Bundle V2 Apis",
+    "description": "Provides APIs for managing and querying Release Bundle versions within a release lifecycle management system.",
+    "version": "2.0.0"
+  },
+  "paths": {
+    "/onemodel/api/v1/graphql": {
+      "post": {
+        "tags": [],
+        "summary": "Get Release Bundle v2 Version (GraphQL)",
+        "description": "Returns the requested data for the Release Bundle v2 version defined by the One Model GraphQL query.",
+        "operationId": "getReleaseBundleV2Version",
+        "parameters": [],
+        "requestBody": {
+          "description": "GraphQL query to fetch a specific Release Bundle version.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "example": "query { releaseBundleVersion { getVersion(name: \"my-release-bundle\", version: \"1.0.0\") { createdBy createdAt } } }"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "createdBy": {
+                      "type": "string",
+                      "description": "The user who created the Release Bundle version."
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "The timestamp of when the Release Bundle version was created."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bad Credentials - The request failed because the provided authentication token is invalid or expired."
+          },
+          "403": {
+            "description": "Permission Denied - The request failed because the authenticated user does not have the required Read permissions for the subject repository."
+          }
+        },
+        "security": [
+          {
+            "OAuth2": []
+          }
+        ]
+      }
+    },
+    "/lifecycle/api/v2/release_bundle/search-by-artifact": {
+      "get": {
+        "summary": "Get Release Bundle v2 Versions by Artifact",
+        "description": "Returns a list of Release Bundle v2 versions that contain the specified artifact.",
+        "operationId": "getReleaseBundleV2VersionsByArtifact",
+        "parameters": [
+          {
+            "name": "artifact_path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The complete path of the artifact to search for. The request must contain either the artifact_path, the sha256, or both."
+          },
+          {
+            "name": "sha256",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filters by the SHA-256 checksum of the artifact. The request must contain either the artifact_path, the sha256, or both."
+          },
+          {
+            "name": "release_bundle_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filters by the name of the Release Bundle."
+          },
+          {
+            "name": "project",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "[optional] Defines the project associated with the Release Bundles. If this parameter is not specified, the default global project is assumed."
+          },
+          {
+            "name": "origin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "source",
+                "target"
+              ]
+            },
+            "description": "Defines where to search for the artifact. If this parameter is not specified, both source and target Release Bundle versions are searched."
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "[optional] Defines the criterion by which to order the returned records: release_bundle_name, release_bundle_version. The default is release_bundle_name."
+          },
+          {
+            "name": "order_asc",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "[optional] Defines whether to list the Release Bundle versions in ascending (true) or descending (false) order. The default value is true."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Sets the number of records to skip before returning the query response. Used for pagination purposes."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Sets the maximum number of versions to return at one time. Used for pagination purposes. If not set, the default is 1000."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "release_bundles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "release_bundle_name": {
+                            "type": "string",
+                            "description": "The Release Bundle name."
+                          },
+                          "release_bundle_version": {
+                            "type": "string",
+                            "description": "The Release Bundle version."
+                          },
+                          "origin": {
+                            "type": "string",
+                            "description": "The origin of the Release Bundle version: source, target."
+                          },
+                          "project_key": {
+                            "type": "string",
+                            "description": "The project associated with the Release Bundle."
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "Status of the Release Bundle: STARTED, FAILED, COMPLETED, DELETING."
+                          },
+                          "created_by": {
+                            "type": "string",
+                            "description": "The name of the user who created the Release Bundle."
+                          },
+                          "created": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Timestamp of when the new version was created (ISO 8601 standard)."
+                          },
+                          "release_status": {
+                            "type": "string",
+                            "description": "Filters by the release status of the Release Bundle version: released, pre_release, trusted_release."
+                          },
+                          "current_stage": {
+                            "type": "string",
+                            "description": "The most recent stage (e.g. QA, Staging) to which the version was promoted successfully."
+                          },
+                          "tag": {
+                            "type": "string",
+                            "description": "The tag assigned to the version to help identify and group it."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (no criteria specified)"
+          },
+          "403": {
+            "description": "Permission Denied"
+          }
+        },
+        "security": []
+      }
+    },
+    "/lifecycle/api/v2/release_bundle/records/{name}/{version}/tag": {
+      "put": {
+        "summary": "Assign Tag to Release Bundle v2 Version",
+        "description": "Assigns a descriptive tag to a Release Bundle v2 version. The tag will appear on the card for the Release Bundle version on the Release Lifecycle kanban board.",
+        "operationId": "assignTagToReleaseBundleV2Version",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string",
+                    "description": "The text of the tag to apply to the Release Bundle version. The tag may contain alphanumeric characters, dashes (-), underscores (_), and periods (.). It should not contain spaces or special characters (@, #, etc.). The maximum length is 128 characters."
+                  }
+                },
+                "required": [
+                  "tag"
+                ]
+              },
+              "example": {
+                "tag": "mytag2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "repository_key": {
+                      "type": "string",
+                      "description": "The repository key related to the Release Bundle. By default, this is release-bundles-v2."
+                    },
+                    "release_bundle_name": {
+                      "type": "string",
+                      "description": "The name of the Release Bundle."
+                    },
+                    "release_bundle_version": {
+                      "type": "string",
+                      "description": "The Release Bundle version."
+                    },
+                    "tag": {
+                      "type": "string",
+                      "description": "The text of the tag applied to the Release Bundle version."
+                    }
+                  },
+                  "example": {
+                    "repository_key": "release-bundles-v2",
+                    "release_bundle_name": "rb1",
+                    "release_bundle_version": "1.0.0",
+                    "tag": "mytag2"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission Denied"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "tags": []
+}
