@@ -1,0 +1,108 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Smart Archiving",
+    "version": "1.0.0",
+    "description": "An API service for managing and searching archived packages within a platform. Suitable for platform admins and project admins with appropriate permissions."
+  },
+  "paths": {
+    "/api/retention/searchPackages": {
+      "post": {
+        "tags": [],
+        "summary": "Search for Archived Packages -1",
+        "description": "updated.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "packageType": {
+                    "type": "string",
+                    "description": "The package type to search for (for example, Docker).",
+                    "example": "docker"
+                  },
+                  "repositories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "The repositories to include in the search results.",
+                    "example": [
+                      "docker-local"
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The package name pattern to include in the search results.",
+                    "example": "*"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "The package version to include in the search results.",
+                    "example": "2022.10.6"
+                  },
+                  "archiveTimeFrom": {
+                    "type": "integer",
+                    "description": "The earliest archive time to include in the search results.",
+                    "example": 1684150761917
+                  },
+                  "archiveTimeTo": {
+                    "type": "integer",
+                    "description": "The latest archive time to include in the search results.",
+                    "example": 1684150761918
+                  }
+                },
+                "required": [
+                  "packageType",
+                  "repositories",
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completed.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "results": [
+                    {
+                      "manifestName": "base-java11-2022.10.6-1684150761917.json",
+                      "packageType": "docker",
+                      "packageName": "bases/base-java11",
+                      "version": "2022.10.6",
+                      "originalRepository": "package-local-to-local-repo-5594",
+                      "archivingTime": 1684150761917
+                    }
+                  ],
+                  "range": {
+                    "start_pos": 0,
+                    "end_pos": 1,
+                    "total": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation errors."
+          },
+          "401": {
+            "description": "Bad Credentials."
+          },
+          "403": {
+            "description": "Unauthorized."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "operationId": "postApiRetentionSearchpackages"
+      }
+    }
+  },
+  "tags": []
+}
