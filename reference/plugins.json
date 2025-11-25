@@ -1,0 +1,398 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Plugins",
+    "description": "Provides comprehensive endpoints for managing and retrieving information about user plugins within the Artifactory environment.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/artifactory/api/plugins/{pluginType}": {
+      "get": {
+        "description": "Returns all available User Plugins information (subject to the permissions of the provided credentials) of the specified type.",
+        "operationId": "retrievePluginInfoOfACertainType",
+        "parameters": [
+          {
+            "name": "pluginType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "example": {
+                  "staging": [
+                    {
+                      "name": "strategy1",
+                      "version": "1.0",
+                      "description": "desc",
+                      "params": {
+                        "key1": "val1"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "authenticatedUser": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/plugins/build/staging/{strategyName}": {
+      "get": {
+        "tags": [],
+        "summary": "Retrieve Build Staging Strategy",
+        "description": "Returns a build staging strategy defined by a User Plugins.",
+        "operationId": "retrieveBuildStagingStrategy",
+        "parameters": [
+          {
+            "name": "strategyName",
+            "in": "path",
+            "required": true,
+            "description": "The name of the staging strategy",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buildName",
+            "in": "query",
+            "required": true,
+            "description": "The name of the build",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "params",
+            "in": "query",
+            "required": false,
+            "description": "Additional parameters in the format p1=v1[,v2][|p2=v3]",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Build Staging Strategy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "defaultModuleVersion": {
+                      "type": "object",
+                      "properties": {
+                        "moduleId": {
+                          "type": "string"
+                        },
+                        "nextRelease": {
+                          "type": "string"
+                        },
+                        "nextDevelopment": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "vcsConfig": {
+                      "type": "object",
+                      "properties": {
+                        "useReleaseBranch": {
+                          "type": "boolean"
+                        },
+                        "releaseBranchName": {
+                          "type": "string"
+                        },
+                        "createTag": {
+                          "type": "boolean"
+                        },
+                        "tagUrlOrName": {
+                          "type": "string"
+                        },
+                        "tagComment": {
+                          "type": "string"
+                        },
+                        "nextDevelopmentVersionComment": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "promotionConfig": {
+                      "type": "object",
+                      "properties": {
+                        "targetRepository": {
+                          "type": "string"
+                        },
+                        "comment": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/plugins/download/{pluginName}": {
+      "get": {
+        "summary": "Retrieve Plugin Code",
+        "description": "Returns the source code of the specified user plugin.",
+        "operationId": "retrievePluginCode",
+        "parameters": [
+          {
+            "name": "pluginName",
+            "in": "path",
+            "required": true,
+            "description": "Name of the plugin to retrieve the source code for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The source code of the plugin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/plugins/reload": {
+      "post": {
+        "description": "Reloads user plugins if there are modifications since the last user plugins reload. Works regardless of the automatic user plugins refresh interval.",
+        "operationId": "reloadPlugins",
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully loaded: myplugin1.groovy, myplugin2.groovy"
+          }
+        },
+        "tags": []
+      }
+    },
+    "/artifactory/api/plugins/execute/{executionName}": {
+      "post": {
+        "tags": [],
+        "description": "Executes a named execution closure found in the executions section of a User Plugins.\nExecution can take parameters and be synchronous (the default) or asynchronous.\nWhen parameters can have multiple values, you can separate the items in one of the following ways:\n- Use a semicolon - ; (recommended)\n- Use the encoding for the pipe (\"|\") character - %7C\nAlternatively, you may configure your NGINX to encode URLs so that if an unencoded pipe is used in the URL, NGINX will encode it to %7C. We recommend that you verify that this configuration does not break any other systems served by NGINX\n\nNotes: Requires Artifactory Pro\nSecurity: Requires an authenticated user (the plugin can control which users/groups are allowed to trigger it)",
+        "operationId": "executePluginCode",
+        "parameters": [
+          {
+            "name": "executionName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "params",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parameters for the execution"
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to 1, the execution will be asynchronous"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Execution successful",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "OK"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/plugins": {
+      "get": {
+        "description": "Returns User Plugins information for Executions and Staging plugins (subject to the permissions of the provided credentials).",
+        "operationId": "retrievePluginInfo",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "executions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "users": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "groups": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "params": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "staging": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "params": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/plugins/build/promote/{promotionName}/{buildName}/{buildNumber}": {
+      "post": {
+        "description": "Executes a named promotion closure found in the promotions section of a User Plugins.",
+        "operationId": "executeBuildPromotion",
+        "parameters": [
+          {
+            "name": "promotionName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buildName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "buildNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "params",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "example": "OK"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "tags": []
+}
