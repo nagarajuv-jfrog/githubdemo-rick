@@ -1,0 +1,287 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "JFrog Artifactory Cleanup Policies API",
+    "description": "API for managing cleanup policies in JFrog Artifactory",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{host}/artifactory/api",
+      "variables": {
+        "host": {
+          "default": "localhost"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "BasicAuth": []
+    },
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/cleanup/packages/policies": {
+      "get": {
+        "summary": "List cleanup policies",
+        "operationId": "getCleanupPolicies",
+        "security": [
+          {
+            "BasicAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of cleanup policies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CleanupPolicy"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create cleanup policy",
+        "operationId": "createCleanupPolicy",
+        "security": [
+          {
+            "BasicAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupPolicyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cleanup policy created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CleanupPolicy"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cleanup/packages/policies/{policyId}": {
+      "get": {
+        "summary": "Get cleanup policy",
+        "operationId": "getCleanupPolicyById",
+        "security": [
+          {
+            "BasicAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the cleanup policy",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A cleanup policy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CleanupPolicy"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cleanup policy not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update cleanup policy",
+        "operationId": "updateCleanupPolicy",
+        "security": [
+          {
+            "BasicAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the cleanup policy",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupPolicyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cleanup policy updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CleanupPolicy"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete cleanup policy",
+        "operationId": "deleteCleanupPolicy",
+        "security": [
+          {
+            "BasicAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the cleanup policy",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Cleanup policy deleted successfully"
+          },
+          "404": {
+            "description": "Cleanup policy not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-JFrog-Art-Api"
+      }
+    },
+    "schemas": {
+      "CleanupPolicy": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the cleanup policy"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the cleanup policy"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the cleanup policy"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ruleType": {
+                  "type": "string",
+                  "description": "The type of rule"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "The value of the rule"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CleanupPolicyInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the cleanup policy"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the cleanup policy"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ruleType": {
+                  "type": "string",
+                  "description": "The type of rule"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "The value of the rule"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
