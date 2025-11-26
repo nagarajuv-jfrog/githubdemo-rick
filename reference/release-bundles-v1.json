@@ -3,7 +3,7 @@
   "info": {
     "title": "Release Bundles V1",
     "version": "1.0.0",
-    "description": "Provides endpoints to manage and retrieve release bundles in Artifactory. Includes operations for querying specific bundles and versions, as well as administrative tasks such as deletion."
+    "description": " updated- nag -Provides endpoints to manage and retrieve release bundles in Artifactory. Includes operations for querying specific bundles and versions, as well as administrative tasks such as deletion."
   },
   "paths": {
     "/artifactory/api/release/bundles/{bundle-name}/{bundle-version}": {
