@@ -1582,5 +1582,24 @@
       }
     }
   },
-  "tags": []
+  "tags": [],
+  "components": {
+    "securitySchemes": {
+      "admin_user": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Admin user authentication"
+      },
+      "admin": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Admin user authentication"
+      },
+      "adminAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Admin user authentication"
+      }
+    }
+  }
 }
