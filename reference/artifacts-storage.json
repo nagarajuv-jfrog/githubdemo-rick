@@ -1,0 +1,1638 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Artifacts Storage",
+    "version": "1.0.0",
+    "description": "Provides APIs to manage and retrieve artifacts stored in the repository. This includes functionalities like retrieving, copying, moving, deleting, and creating artifacts, handling storage optimization, and managing build artifacts and compliance information. Each endpoint is designed to ensure secure and efficient interaction with the artifact storage system."
+  },
+  "paths": {
+    "/artifactory/api/archive/buildArtifacts": {
+      "post": {
+        "description": "Returns an archive file (supports zip/tar/tar.gz/tgz) containing all the artifacts related to a specific build, you can optionally provide mappings to filter the results; the mappings support regexp capturing groups which enables you to dynamically construct the target path inside the result archive file.",
+        "operationId": "retrieveBuildArtifactsArchive",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of build artifacts archive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": "Optionally refine the search by providing a list of regexp patterns to search by"
+        }
+      }
+    },
+    "/artifactory/api/download/{repoKey}/{filePath}": {
+      "get": {
+        "description": "Downloads an artifact with or without returning the actual content to the client. When tracking the progress marks are printed (by default every 1024 bytes). This is extremely useful if you want to trigger downloads on a remote Artifactory server, for example to force eager cache population of large artifacts, but want to avoid the bandwidth consumption involved in transferring the artifacts to the triggering client. If no content parameter is specified the file content is downloaded to the client.",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "Repository key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filePath",
+            "in": "path",
+            "required": true,
+            "description": "File path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Specifies whether to return the actual content or just the progress",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "none",
+                "progress"
+              ]
+            }
+          },
+          {
+            "name": "mark",
+            "in": "query",
+            "required": false,
+            "description": "Number of bytes to print a new progress mark",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful download",
+            "content": {
+              "application/octet-stream": {},
+              "text/plain": {}
+            }
+          }
+        },
+        "security": [],
+        "tags": [],
+        "operationId": "getArtifactoryApiDownloadRepokeyFilepath"
+      }
+    },
+    "/artifactory/api/storageinfo": {
+      "get": {
+        "summary": "Get Storage Summary Info",
+        "description": "Returns storage summary information regarding binaries, file store and repositories.",
+        "operationId": "getStorageSummaryInfo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "binariesSummary": {
+                    "binariesCount": "125,726",
+                    "binariesSize": "3.48 GB",
+                    "artifactsSize": "59.77 GB",
+                    "optimization": "5.82%",
+                    "itemsCount": "2,176,580",
+                    "artifactsCount": "2,084,408"
+                  },
+                  "fileStoreSummary": {
+                    "storageType": "filesystem",
+                    "storageDirectory": "/home/.../artifactory/devenv/.artifactory/data/filestore",
+                    "totalSpace": "204.28 GB",
+                    "usedSpace": "32.22 GB (15.77%)",
+                    "freeSpace": "172.06 GB (84.23%)"
+                  },
+                  "repositoriesSummaryList": [
+                    {
+                      "repoKey": "plugins-release",
+                      "repoType": "VIRTUAL",
+                      "foldersCount": 0,
+                      "filesCount": 0,
+                      "usedSpace": "0 bytes",
+                      "itemsCount": 0,
+                      "packageType": "Maven",
+                      "percentage": "0%"
+                    },
+                    {
+                      "repoKey": "repo",
+                      "repoType": "VIRTUAL",
+                      "foldersCount": 0,
+                      "filesCount": 0,
+                      "usedSpace": "0 bytes",
+                      "itemsCount": 0,
+                      "packageType": "Generic",
+                      "percentage": "0%"
+                    },
+                    {
+                      "repoKey": "TOTAL",
+                      "repoType": "NA",
+                      "foldersCount": 92172,
+                      "filesCount": 2084408,
+                      "usedSpace": "59.77 GB",
+                      "itemsCount": 2176580
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/storage/{repoKey}/{filePath}": {
+      "get": {
+        "tags": [],
+        "summary": "Get File Info",
+        "description": "Returns file Information. For virtual use the virtual repository returns the resolved file. Supported by local, local-cached and virtual repositories.",
+        "operationId": "getFileInfo",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filePath",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "downloadUri": {
+                      "type": "string"
+                    },
+                    "repo": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "remoteUrl": {
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
+                      "type": "string"
+                    },
+                    "lastModified": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "modifiedBy": {
+                      "type": "string"
+                    },
+                    "lastUpdated": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "mimeType": {
+                      "type": "string"
+                    },
+                    "checksums": {
+                      "type": "object",
+                      "properties": {
+                        "md5": {
+                          "type": "string"
+                        },
+                        "sha1": {
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "originalChecksums": {
+                      "type": "object",
+                      "properties": {
+                        "md5": {
+                          "type": "string"
+                        },
+                        "sha1": {
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "privilegedUser": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/zap/{repository-name}-cache/{repository-path}": {
+      "post": {
+        "tags": [],
+        "summary": "Zap Cache",
+        "description": "Zapping cache invalidates all cached metadata artifacts downloaded from central registries like pypi.org, repo1.maven.org, registry.npmjs.org and stored in remote repo cache to speed up remote repo actions.",
+        "operationId": "zapCache",
+        "parameters": [
+          {
+            "name": "repository-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repository-path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed zapping cache in path",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Message": "Completed zapping cache in path repo1-cache/com/acme-new"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "privilegedUser": [
+              "Manage",
+              "Delete"
+            ]
+          }
+        ]
+      }
+    },
+    "/artifactory/{repo-key}/path/to/artifact.jar!/path/to/archived/resource": {
+      "get": {
+        "description": "Returns an archived resource from the specified archive destination.",
+        "security": [
+          {
+            "type": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/octet-stream": {
+                "example": "Manifest-Version: 1.0\nCreated-By: Maven Jar Plugin 3.2.0\nBuild-Jdk-Spec: 11\nImplementation-Title: demo\nImplementation-Version: 0.0.3\nMain-Class: org.springframework.boot.loader.JarLauncher\nStart-Class: com.jfrog.Calculator\nSpring-Boot-Version: 2.6.0\nSpring-Boot-Classes: BOOT-INF/classes/\nSpring-Boot-Lib: BOOT-INF/lib/\nSpring-Boot-Classpath-Index: BOOT-INF/classpath.idx\nSpring-Boot-Layers-Index: BOOT-INF/layers.idx"
+              }
+            }
+          }
+        },
+        "tags": [],
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/artifactory/api/build/retention/{buildName}": {
+      "post": {
+        "summary": "Control Build Retention",
+        "description": "Specifies retention parameters for build info",
+        "operationId": "controlBuildRetention",
+        "parameters": [
+          {
+            "name": "buildName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name of the build"
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Flag to control how the endpoint responds to the client regarding build operations"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "deleteBuildArtifacts": {
+                    "type": "boolean",
+                    "description": "When true, automatically removes build artifacts stored in Artifactory"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "description": "The maximum number of builds to store in Artifactory"
+                  },
+                  "minimumBuildDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Earliest build date to store in Artifactory - ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)"
+                  },
+                  "buildNumbersNotToBeDiscarded": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "List of build numbers that should not be removed from Artifactory"
+                  }
+                },
+                "example": {
+                  "deleteBuildArtifacts": true,
+                  "count": 100,
+                  "minimumBuildDate": "1407345768020",
+                  "buildNumbersNotToBeDiscarded": [
+                    5,
+                    9
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [],
+        "tags": []
+      }
+    },
+    "/artifactory/api/copy/{srcRepoKey}/{srcFilePath}": {
+      "post": {
+        "tags": [],
+        "summary": "Copy Item",
+        "description": "Copy an artifact or a folder to the specified destination. Supported for local, remote and Federated repositories only.\n\nOptionally suppress cross-layout module path translation during copy.\n\nYou can test the copy using a dry run.\n\nCopy item behaves similarly to a standard file system and supports renames. If the target path does not exist, the source item is copied and optionally renamed. Otherwise, if the target exists and it is a directory,\n\nthe source is copied and placed under the target directory.\n\nNotes: Requires Artifactory Pro\n\nSecurity: Requires a privileged user (can be anonymous)",
+        "operationId": "copyItem",
+        "parameters": [
+          {
+            "name": "srcRepoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "srcFilePath",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dry",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ],
+              "default": 0
+            }
+          },
+          {
+            "name": "suppressLayouts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ],
+              "default": 1
+            }
+          },
+          {
+            "name": "failFast",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ],
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "level": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/repo-key/path/to/artifact.ext": {
+      "get": {
+        "summary": "Trace Artifact Retrieval",
+        "description": "Simulates an artifact retrieval request from the specified location and returns verbose output about the resolution process. This API is useful for debugging artifact retrieval issues.",
+        "security": [],
+        "operationId": "TraceArtifactRetrieval",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/artifactory/api/system/storage/optimize": {
+      "post": {
+        "tags": [],
+        "summary": "Optimize System Storage",
+        "description": "Raises a flag to invoke balancing between redundant storage units of a shared filestore following the next full garbage collection (from Artifactory Self-Hosted 4.6.0 to 7.98.x).\nImmediately triggers balancing between redundant storage units of a sharded filestore. If balancing is already running, the process is skipped (from Artifactory Self-Hosted 7.104.5 and later).\n\nSince: 4.6.0\n\nNotes: This is an advanced feature intended for administrators.\n\nSecurity: Requires a valid admin user.",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        },
+        "operationId": "OptimizeSystemStorage",
+        "parameters": []
+      }
+    },
+    "/artifactory/api/storage/{repoKey}/{item-path}": {
+      "get": {
+        "description": "Returns the last modified item at the given path. If the given path is a folder, the latest last modified item is searched for recursively. Supported by local and local-cached repositories.",
+        "operationId": "getLastModifiedItem",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "item-path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uri": {
+                      "type": "string",
+                      "example": "http://localhost:8081/artifactory/api/storage/libs-release-local/org/acme/foo/1.0-SNAPSHOT/foo-1.0-SNAPSHOT.pom"
+                    },
+                    "lastModified": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "ISO8601"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/archive/download/{repoKey}/{path}": {
+      "get": {
+        "description": "Returns an archive file (supports zip/tar/tar.gz/tgz) containing all the artifacts that reside under the specified path (folder or repository root). Requires Enable Folder Download to be set. See Configuring Artifactory. From version 5.10, If any artifact in the folder is blocked for download by Xray, the whole folder download is blocked and this call will return an HTTP Forbidden (403) error. Requires Artifactory Pro (Multiple downloads could be slow and CPU Intensive). Downloading a folder or a repository's root is only supported for local (or cache) repositories. GET artifactory/api/archive/download/{repoKey}/{path}?archiveType={archiveType}[&includeChecksumFiles=true]",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "The repository key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "description": "The path to the folder or repository root",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "archiveType",
+            "in": "query",
+            "required": true,
+            "description": "The type of archive file (zip/tar/tar.gz/tgz)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeChecksumFiles",
+            "in": "query",
+            "required": false,
+            "description": "Include checksum files",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/artifactory/api/storageinfo/calculate": {
+      "post": {
+        "summary": "Refresh Storage Summary Info",
+        "description": "Refreshes storage summary information regarding binaries, file store and repositories.",
+        "operationId": "refreshStorageSummaryInfo",
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Storage summary information refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [],
+        "parameters": []
+      }
+    },
+    "/artifactory/api/compliance/{repoKey}/{item-path}": {
+      "get": {
+        "description": "Get compliance info for a given artifact path. The result includes license and vulnerabilities if any. Supported by local and local-cached repositories.",
+        "deprecated": true,
+        "security": [
+          {
+            "authenticatedUser": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "The key of the repository",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "item-path",
+            "in": "path",
+            "required": true,
+            "description": "The path of the item",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "licenses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "vulnerabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/bintray/push": {
+      "post": {
+        "tags": [],
+        "summary": "Push a Set of Artifacts to Bintray",
+        "description": "Push a set of artifacts to Bintray as a version. Uses a descriptor file (that must have `bintray-info` in its filename and a .json extension) that was deployed to Artifactory. The call accepts the full path to the descriptor as a parameter. Signing a version is controlled by the `gpgSign` parameter in the descriptor file and the `gpgSign` parameter passed to this command. The value passed to this command always takes precedence over the value in the descriptor file. If you also want a passphrase to be applied to your signature, specify `gpgPassphrase=<passphrase>`. Security: Requires a valid user with deploy permissions and Bintray credentials defined.",
+        "deprecated": true,
+        "operationId": "pushArtifactsToBintray",
+        "parameters": [
+          {
+            "name": "descriptor",
+            "in": "query",
+            "required": true,
+            "description": "Path to the descriptor file",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "gpgPassphrase",
+            "in": "query",
+            "required": false,
+            "description": "Passphrase for the GPG signature",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "gpgSign",
+            "in": "query",
+            "required": false,
+            "description": "Whether to sign the version with GPG",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pushing build to Bintray finished successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Message": {
+                      "type": "string",
+                      "example": "Pushing build to Bintray finished successfully."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/storage/{repoKey}/{folder-path}": {
+      "get": {
+        "description": "Get a flat (the default) or deep listing of the files and folders (not included by default) within a folder. For deep listing you can specify an optional depth to limit the results. Optionally include a map of metadata timestamp values as part of the result (only properties are displayed in since 3.0.0). Folder inclusion since 2.3.2; checksum inclusion since: 2.3.3; include folder root path since: 2.5.2. Supported by all types of repositories.",
+        "operationId": "getFileList",
+        "parameters": [
+          {
+            "name": "repoKey",
+            "in": "path",
+            "required": true,
+            "description": "Repository key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folder-path",
+            "in": "path",
+            "required": true,
+            "description": "Path to the folder",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "list",
+            "in": "query",
+            "required": true,
+            "description": "List files and folders",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "deep",
+            "in": "query",
+            "required": false,
+            "description": "Deep listing of the files and folders",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Depth to limit the results",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "listFolders",
+            "in": "query",
+            "required": false,
+            "description": "Include folders in the listing",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "mdTimestamps",
+            "in": "query",
+            "required": false,
+            "description": "Include metadata timestamp values",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "includeRootPath",
+            "in": "query",
+            "required": false,
+            "description": "Include folder root path",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "uri": "http://localhost:8081/artifactory/api/storage/libs-release-local/org/acme",
+                  "created": "ISO8601",
+                  "files": [
+                    {
+                      "uri": "/archived",
+                      "size": "-1",
+                      "lastModified": "ISO8601",
+                      "folder": "true"
+                    },
+                    {
+                      "uri": "/doc.txt",
+                      "size": "253207",
+                      "lastModified": "ISO8601",
+                      "folder": "false",
+                      "sha1": "sha1Checksum",
+                      "mdTimestamps": {
+                        "properties": "lastModified (ISO8601)"
+                      }
+                    },
+                    {
+                      "uri": "/archived/doc1.txt",
+                      "size": "253100",
+                      "lastModified": "ISO8601",
+                      "folder": "false",
+                      "sha1": "sha1Checksum",
+                      "mdTimestamps": {
+                        "properties": "lastModified (ISO8601)"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/move/{srcRepoKey}/{srcFilePath}": {
+      "post": {
+        "description": "Moves an artifact or a folder to the specified destination. Supported by local repositories only. Optionally suppress cross-layout module path translation during move. You can test the move using dry run. Move item behaves similarly to a standard file system and supports renames. If the target path does not exist, the source item is moved and optionally renamed. Otherwise, if the target exists and it is a directory, the source is moved and placed under the target directory.",
+        "security": [
+          {
+            "privilegedUser": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "srcRepoKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "srcFilePath",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dry",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "suppressLayouts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "failFast",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful move operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "level": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/tasks": {
+      "get": {
+        "summary": "Get Background Tasks",
+        "description": "Returns list of background tasks currently scheduled or running in Artifactory. In HA, the nodeId is added to each task. Task can be in one of few states: scheduled, running, stopped, cancelled. Running task also shows the task start time.",
+        "operationId": "getBackgroundTasks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "tasks": [
+                    {
+                      "id": "artifactory.UpdateIndicesJob#d7321feb-6fd9-4e27-8f0e-954137be855b",
+                      "type": "org.artifactory.addon.gems.index.GemsVirtualIndexHandler$UpdateIndicesJob",
+                      "state": "scheduled",
+                      "description": "Gems Virtual Repositories Index Calculator",
+                      "nodeId": "artifactory-primary"
+                    },
+                    {
+                      "id": "artifactory.VirtualCacheCleanupJob#82bb1514-ea34-4a71-940d-78a61887981e",
+                      "type": "org.artifactory.repo.cleanup.VirtualCacheCleanupJob",
+                      "state": "scheduled",
+                      "description": "",
+                      "nodeId": "artifactory-primary"
+                    },
+                    {
+                      "id": "artifactory.BinaryStoreGarbageCollectorJob#039664ac-990d-4a32-85e1-decd0b508142",
+                      "type": "org.artifactory.storage.binstore.service.BinaryStoreGarbageCollectorJob",
+                      "state": "running",
+                      "started": "2015-05-15T15:39:37.566+02:00",
+                      "description": "Binaries Garbage Collector",
+                      "nodeId": "artifactory-primary"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": []
+      }
+    },
+    "/artifactory/api/gems/{repoName}/api/v1/versions/{gemName}.{format}": {
+      "get": {
+        "description": "Returns the list of versions and other metadata associated with a specific Ruby gem.",
+        "operationId": "getRubyGemVersionList",
+        "parameters": [
+          {
+            "name": "repoName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "gemName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "yaml"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "authors": {
+                        "type": "string"
+                      },
+                      "built_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "downloads_count": {
+                        "type": "integer"
+                      },
+                      "metadata": {
+                        "type": "object"
+                      },
+                      "number": {
+                        "type": "string"
+                      },
+                      "summary": {
+                        "type": "string"
+                      },
+                      "platform": {
+                        "type": "string"
+                      },
+                      "ruby_version": {
+                        "type": "string"
+                      },
+                      "prerelease": {
+                        "type": "boolean"
+                      },
+                      "licenses": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "requirements": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "sha": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "authors": {
+                        "type": "string"
+                      },
+                      "built_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "downloads_count": {
+                        "type": "integer"
+                      },
+                      "metadata": {
+                        "type": "object"
+                      },
+                      "number": {
+                        "type": "string"
+                      },
+                      "summary": {
+                        "type": "string"
+                      },
+                      "platform": {
+                        "type": "string"
+                      },
+                      "ruby_version": {
+                        "type": "string"
+                      },
+                      "prerelease": {
+                        "type": "boolean"
+                      },
+                      "licenses": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "requirements": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "sha": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/sync/{remoteRepositoryKey}/{folderPath}": {
+      "get": {
+        "summary": "Folder Sync (Deprecated)",
+        "description": "Triggers a no-content download of artifacts from a remote Artifactory repository for all artifacts under the specified remote folder. Can optionally delete local files if they do not exist in the remote folder, overwrite local files only if they are older than remote files or never overwrite local files. The default is not to delete any local files and to overwrite older local files with remote ones. By default progress marks of the sync are displayed. The default timeout for the remote file list is 15000 milliseconds (15 seconds).",
+        "deprecated": true,
+        "security": [
+          {
+            "privileged": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "remoteRepositoryKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folderPath",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "progress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mark",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "delete",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "overwrite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "never",
+                "force"
+              ]
+            }
+          },
+          {
+            "name": "timeout",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sync completed",
+            "content": {
+              "text/plain": {
+                "example": "Completed with 0 errors and 2 warnings (please check the server log for more details)."
+              }
+            }
+          }
+        },
+        "operationId": "FolderSync(Deprecated)"
+      }
+    },
+    "/artifactory/{repo-key}/{path}/": {
+      "put": {
+        "description": "Create new directory at the specified destination.",
+        "security": [
+          {
+            "deploy": []
+          }
+        ],
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "Directory created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "repo": "example",
+                  "path": "/testfolder",
+                  "created": "2024-11-25T21:56:39.689Z",
+                  "createdBy": "rasul",
+                  "downloadUri": "https://hts1.jfrog.io/artifactory/example/testfolder/",
+                  "mimeType": "application/octet-stream",
+                  "size": "0",
+                  "checksums": {
+                    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                    "md5": "d41d8cd98f00b204e9800998ecf8427e",
+                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  "originalChecksums": {
+                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  "uri": "https://hts1.jfrog.io/artifactory/example/testfolder/"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/artifactory/{repo-key}/{path-to-artifact}": {
+      "get": {
+        "description": "Returns an artifact from the specified destination. skipUpdateStats param allows skip stats update.",
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "description": "Repository key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path-to-artifact",
+            "in": "path",
+            "required": true,
+            "description": "Path to the artifact",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skipUpdateStats",
+            "in": "query",
+            "required": false,
+            "description": "Skip stats update",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Artifact retrieved successfully"
+          },
+          "404": {
+            "description": "Artifact not found"
+          }
+        },
+        "security": [
+          {
+            "read_permission": []
+          }
+        ]
+      }
+    },
+    "/artifactory/{repo-key}/{path-to-file-or-folder}": {
+      "delete": {
+        "description": "Deletes a file or a folder from the specified local repository or remote repository cache.",
+        "security": [
+          {
+            "delete_permission": []
+          }
+        ],
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "Item successfully deleted"
+          },
+          "403": {
+            "description": "Forbidden: User does not have 'delete' permission"
+          },
+          "404": {
+            "description": "Item not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path-to-file-or-folder",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/artifactory/{repo-key}/{item-path}": {
+      "get": {
+        "summary": "Retrieve Latest Artifact",
+        "description": "Returns the latest artifact version from the specified destination.",
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Repository key"
+          },
+          {
+            "name": "item-path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path to the artifact (e.g., path/to/artifact.ext)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of the latest artifact",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters"
+          },
+          "404": {
+            "description": "Artifact not found"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "operationId": "RetrieveLatestArtifact"
+      }
+    }
+  },
+  "tags": [],
+  "components": {
+    "securitySchemes": {
+      "accessToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Access token authentication"
+      },
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "HTTP Basic Authentication"
+      },
+      "privilegedUser": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Privileged user authentication"
+      },
+      "delete_permission": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Delete permission required"
+      },
+      "api_key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-JFrog-Art-Api",
+        "description": "API Key authentication"
+      },
+      "type": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Authentication type"
+      },
+      "adminAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Admin user authentication"
+      },
+      "read_permission": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Read permission required"
+      },
+      "authenticatedUser": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Authenticated user"
+      },
+      "deploy": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Deploy permission required"
+      },
+      "privileged": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Privileged user authentication"
+      }
+    }
+  }
+}
