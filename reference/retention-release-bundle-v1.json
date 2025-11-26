@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Retention Release Bundle V1",
-    "description": "Provides endpoints for managing and retrieving retention policy configurations in the Artifactory system.",
+    "description": "Updated- Provides endpoints for managing and retrieving retention policy configurations in the Artifactory system.",
     "version": "1.0.0"
   },
   "paths": {
