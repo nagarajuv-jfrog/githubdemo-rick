@@ -7,7 +7,7 @@ metadata:
 ---
 ## First subhead
 
-You need to go to the second subhead for that information
+You need to go to the second subh[head](https://jfrog-poc-group.readme.io/jfrog-artifactorydocs/copy-of-release-lifecycle-management#yet-another-subhead)ead for that information
 
 An essential part of delivering quality software is creating releases that are validated as they advance through the software development lifecycle (SDLC) toward their eventual consumption by end users. If not managed properly, the lifecycle of releases can become a complex process involving multiple tools and inconsistent processes used by different development teams, leading to an inefficient software supply chain.
 
