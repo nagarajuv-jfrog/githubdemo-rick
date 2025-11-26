@@ -321,5 +321,20 @@
       }
     }
   },
-  "tags": []
+  "tags": [],
+  "components": {
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://example.com/oauth/authorize",
+            "tokenUrl": "https://example.com/oauth/token",
+            "scopes": {}
+          }
+        },
+        "description": "OAuth2 authentication"
+      }
+    }
+  }
 }
