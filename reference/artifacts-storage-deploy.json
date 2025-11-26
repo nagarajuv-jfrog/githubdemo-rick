@@ -1,0 +1,333 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Artifacts Storage - Deploy Artifact Apis",
+    "version": "1.0.0",
+    "description": "APIs for deploying artifacts to Artifactory, including various options for checksum verification, content upload, and archive management."
+  },
+  "paths": {
+    "/artifactory/{repo-key}/{path}/artifact.ext": {
+      "put": {
+        "tags": [],
+        "summary": "Deploy Artifact",
+        "description": "Deploy an artifact to the specified destination. You can also Attach Properties as part of deploying artifacts. Requires a user with 'deploy' permissions (can be anonymous). Optionally, you can provide checksum headers to verify the integrity of the deployment. Artifactory rejects the deployment if the checksums do not match. In certain cases (particularly when working with large artifacts), the Created timestamp might be later than the Last Modified timestamp. This can occur because the Last Modified timestamp records when the upload began, whereas the Created timestamp is set only when the upload is complete and committed to the database.",
+        "operationId": "deployArtifact",
+        "requestBody": {
+          "description": "Binary data of the artifact to be deployed",
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Checksum-Sha1",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Checksum-Sha256",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "repo": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
+                      "type": "string"
+                    },
+                    "downloadUri": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "mimeType": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "string"
+                    },
+                    "checksums": {
+                      "type": "object",
+                      "properties": {
+                        "md5": {
+                          "type": "string"
+                        },
+                        "sha1": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "originalChecksums": {
+                      "type": "object",
+                      "properties": {
+                        "md5": {
+                          "type": "string"
+                        },
+                        "sha1": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "uri": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Duplicate/Conflict"
+          }
+        }
+      }
+    },
+    "/artifactory/path1/to/repo-key/path2/to/archive.zip": {
+      "put": {
+        "summary": "Deploy Artifacts from Archive",
+        "description": "Deploys an archive containing multiple artifacts and extracts it at the specified destination while maintaining the archive's file structure.",
+        "operationId": "deployArtifactsFromArchive",
+        "security": [
+          {
+            "userAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/zip": {},
+            "application/x-tar": {},
+            "application/gzip": {},
+            "application/x-gtar": {}
+          }
+        },
+        "responses": {
+          "100": {
+            "description": "Continue"
+          },
+          "default": {
+            "description": "Successful deployment",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-Explode-Archive",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Archive will be exploded upon deployment"
+          },
+          {
+            "name": "X-Explode-Archive-Atomic",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Archive will be exploded in an atomic operation upon deployment"
+          }
+        ]
+      }
+    },
+    "/artifactory/{repo-key}/{item-path}": {
+      "put": {
+        "tags": [],
+        "summary": "Deploy Artifact by Checksum",
+        "description": "Deploy an artifact to the specified destination by checking if the artifact content already exists in Artifactory. If Artifactory already contains a user-readable artifact with the same checksum, the artifact content is copied to the new location and returns a response without requiring content transfer. Otherwise, a 404 error is returned to indicate that content upload is expected to deploy the artifact. If the X-Checksum-Deploy header is set to false, the artifact will be uploaded successfully with a 201 response, even if it didn't exist before, and submitted checksums will have the status Uploaded: Identical.",
+        "security": [
+          {
+            "deployAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "item-path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path to the artifact (e.g., path/to/artifact.ext)"
+          },
+          {
+            "name": "X-Checksum-Deploy",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "X-Checksum-Sha1",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Checksum-Sha256",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Checksum",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Artifact uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "downloadUri": {
+                      "type": "string"
+                    },
+                    "repo": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
+                      "type": "string"
+                    },
+                    "mimeType": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "string"
+                    },
+                    "checksums": {
+                      "type": "object",
+                      "properties": {
+                        "sha1": {
+                          "type": "string"
+                        },
+                        "md5": {
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "originalChecksums": {
+                      "type": "object",
+                      "properties": {
+                        "sha1": {
+                          "type": "string"
+                        },
+                        "md5": {
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Artifact not found, content upload expected"
+          }
+        },
+        "operationId": "DeployArtifactbyChecksum"
+      }
+    }
+  },
+  "tags": [],
+  "components": {
+    "securitySchemes": {
+      "userAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "User authentication"
+      },
+      "deployAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Deploy permission required"
+      }
+    }
+  }
+}
