@@ -394,5 +394,30 @@
       }
     }
   },
-  "tags": []
+  "tags": [],
+  "components": {
+    "securitySchemes": {
+      "adminAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Admin user authentication"
+      },
+      "api_key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-JFrog-Art-Api",
+        "description": "API Key authentication"
+      },
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "HTTP Basic Authentication"
+      },
+      "authenticatedUser": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Authenticated user"
+      }
+    }
+  }
 }
