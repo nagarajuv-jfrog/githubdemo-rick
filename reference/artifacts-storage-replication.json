@@ -709,5 +709,39 @@
       }
     }
   },
-  "tags": []
+  "tags": [],
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "HTTP Basic Authentication"
+      },
+      "privilegedUser": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Privileged user authentication"
+      },
+      "admin": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Admin user authentication"
+      },
+      "adminAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Admin user authentication"
+      },
+      "privileged_user": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Privileged user authentication"
+      },
+      "adminUser": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Admin user authentication"
+      }
+    }
+  }
 }
