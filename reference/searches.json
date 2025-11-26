@@ -1,0 +1,1509 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Searches",
+    "version": "1.0.0",
+    "description": "Updated- Provides various search functionalities for artifact repositories including checksum, license, archive entries, latest version, Docker repositories, and more."
+  },
+  "paths": {
+    "/artifactory/api/search/badChecksum": {
+      "get": {
+        "description": "Find all artifacts that have bad or missing client checksum values (md5 or sha1). Searches return file info URIs. Can limit the search to specific repositories (local, remote-cache, or virtual). Requires Artifactory Pro or higher.",
+        "operationId": "badChecksumSearch",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "description": "Type of checksum to search for (md5 or sha1)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "md5",
+                "sha1"
+              ]
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of repository keys to limit the search to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string",
+                            "description": "URI of the artifact"
+                          },
+                          "serverMd5": {
+                            "type": "string",
+                            "description": "Server MD5 checksum"
+                          },
+                          "clientMd5": {
+                            "type": "string",
+                            "description": "Client MD5 checksum, empty string if missing"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "results": [
+                    {
+                      "uri": "/artifactory/api/storage/libs-release-local/org/jfrog/build-info-api/1.3.1/build-info-api-1.3.1.jar",
+                      "serverMd5": "4040c7c184620af0a0a8a3682a75eb7",
+                      "clientMd5": "4040c7c184620af0a0a8a3682a75e44"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/artifactory/api/search/license": {
+      "get": {
+        "description": "Search for artifacts that were already tagged with license information and their respective licenses.",
+        "parameters": [
+          {
+            "name": "unapproved",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "unknown",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "notfound",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "neutral",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "approved",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "autofind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string"
+                          },
+                          "license": {
+                            "type": "string"
+                          },
+                          "found": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "operationId": "getArtifactoryApiSearchLicense"
+      }
+    },
+    "/artifactory/api/search/archive": {
+      "get": {
+        "tags": [],
+        "summary": "Archive Entries Search (Class Search)",
+        "description": "Search archive for classes or any other resources within an archive. Can limit search to specific repositories (local or caches).",
+        "deprecated": true,
+        "operationId": "getArchiveEntriesSearch",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "description": "The name of the archive entry to search for.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of repositories to limit the search to.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "entry": {
+                            "type": "string"
+                          },
+                          "archiveUris": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "results": [
+                    {
+                      "entry": "org/apache/jackrabbit/core/query/lucene/AbstractIndex.LoggingPrintStream.class",
+                      "archiveUris": [
+                        "/artifactory/api/storage/third-party-releases-local/org/apache/jackrabbit/jackrabbit-core/1.2.3/jackrabbit-core-1.2.3.jar",
+                        "/artifactory/api/storage/third-party-releases-local/org/apache/jackrabbit/jackrabbit-core/1.3.1/jackrabbit-core-1.3.1.jar"
+                      ]
+                    },
+                    {
+                      "entry": "org/codehaus/plexus/logging/AbstractLogger.class",
+                      "archiveUris": [
+                        "/artifactory/api/storage/repo1-cache/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.jar"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/search/latestVersion": {
+      "get": {
+        "summary": "Artifact Latest Version Search Based on Layout",
+        "description": "Search for the latest artifact version by groupId and artifactId, based on the definitions in the Repository Layouts.",
+        "parameters": [
+          {
+            "name": "g",
+            "in": "query",
+            "description": "groupId of the artifact",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "a",
+            "in": "query",
+            "description": "artifactId of the artifact",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "description": "version of the artifact",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remote",
+            "in": "query",
+            "description": "Whether to include remote repositories in the search (1 to include remote)",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "description": "Comma-separated list of repositories to limit the search",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful search",
+            "content": {
+              "text/plain": {
+                "example": "1.0-201203131455-2"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [],
+        "operationId": "ArtifactLatestVersionSearchBasedonLayout"
+      }
+    },
+    "/api/docker/{repo-key}/v2/_catalog": {
+      "get": {
+        "description": "Lists all Docker repositories (the registry's _catalog) hosted in an Artifactory Docker repository.",
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "description": "Key of the repository",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "description": "Pagination parameter to specify the number of repositories to return",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "description": "Pagination parameter to specify the last repository from previous response",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "repositories": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": {
+                    "repositories": [
+                      "busybox",
+                      "centos",
+                      "hello-world"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "readPermission": []
+          }
+        ],
+        "operationId": "getApiDockerRepoKeyV2Catalog"
+      }
+    },
+    "/artifactory/api/search/usage": {
+      "get": {
+        "summary": "Artifacts Not Downloaded Since",
+        "description": "Returns all artifacts not downloaded since the specified Java epoch in milliseconds. Optionally include only artifacts created before the specified `createdBefore` date, otherwise only artifacts created before `notUsedSince` are returned. Can limit search to specific repositories (local or caches).",
+        "operationId": "artifactsNotDownloadedSince",
+        "parameters": [
+          {
+            "name": "notUsedSince",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Specified Java epoch in milliseconds."
+          },
+          {
+            "name": "createdBefore",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Artifacts created before the specified date."
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Limit search to specific repositories (local or caches)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string"
+                          },
+                          "lastDownloaded": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "auth": []
+          }
+        ]
+      }
+    },
+    "/api/docker/{repo-key}/v2/{image name}/tags/list": {
+      "get": {
+        "description": "Lists all tags of the specified Artifactory Docker repository.",
+        "operationId": "listDockerTags",
+        "parameters": [
+          {
+            "name": "repo-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "image name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of consecutive tags"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Last tag position (numeric) from previous response"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": {
+                    "name": "postgres",
+                    "tags": [
+                      "9.5.2"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "privilegedUser": []
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/artifactory/api/search/dates": {
+      "get": {
+        "description": "Get all artifacts with specified dates within the given range. Search can be limited to specific repositories (local or caches).",
+        "operationId": "getArtifactsWithDateInDateRange",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Start date in milliseconds since the epoch or ISO8601 string value. Mandatory.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "End date in milliseconds since the epoch or ISO8601 string value. If not provided, now() will be used.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "description": "Comma-separated list of repository keys.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateFields",
+            "in": "query",
+            "description": "Comma-separated list of date fields to filter by. Supported fields: created, lastModified, lastDownloaded. Mandatory.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string"
+                          },
+                          "created": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "lastModified": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Missing mandatory parameters."
+          }
+        },
+        "security": []
+      }
+    },
+    "/artifactory/api/search/versions": {
+      "get": {
+        "description": "Search for all available artifact versions by GroupId and ArtifactId in local, remote, or virtual repositories.",
+        "parameters": [
+          {
+            "name": "g",
+            "in": "query",
+            "description": "GroupId of the artifact",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "a",
+            "in": "query",
+            "description": "ArtifactId of the artifact",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "description": "Version of the artifact (optional, can accept * and/or ? wildcards)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remote",
+            "in": "query",
+            "description": "Set to 1 to include remote repositories in the search (optional)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "description": "Comma-separated list of repositories to limit the search (optional)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "version": {
+                            "type": "string"
+                          },
+                          "integration": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "results": [
+                        {
+                          "version": "1.2",
+                          "integration": false
+                        },
+                        {
+                          "version": "1.0-SNAPSHOT",
+                          "integration": true
+                        },
+                        {
+                          "version": "1.0",
+                          "integration": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getArtifactoryApiSearchVersions"
+      }
+    },
+    "/artifactory/api/search/checksum": {
+      "get": {
+        "description": "Artifact search by checksum (md5, sha1, or sha256). Searches return file info URIs. Can limit search to specific repositories (local, remote-cache or virtual).",
+        "operationId": "checksumSearch",
+        "parameters": [
+          {
+            "name": "md5",
+            "in": "query",
+            "required": false,
+            "description": "MD5 checksum to search for",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sha1",
+            "in": "query",
+            "required": false,
+            "description": "SHA1 checksum to search for",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sha256",
+            "in": "query",
+            "required": false,
+            "description": "SHA256 checksum to search for",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of repositories to limit the search to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string",
+                            "description": "URI of the found artifact"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/search/pattern": {
+      "get": {
+        "description": "Get all artifacts matching the given Ant path pattern",
+        "operationId": "patternSearch",
+        "parameters": [
+          {
+            "name": "pattern",
+            "in": "query",
+            "required": true,
+            "description": "Ant path pattern to search for artifacts",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "repositoryUri": {
+                      "type": "string"
+                    },
+                    "sourcePattern": {
+                      "type": "string"
+                    },
+                    "files": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "privilegedNonAnonymousUser": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/search/aql": {
+      "post": {
+        "tags": [],
+        "summary": "Artifactory Query Language (AQL)",
+        "description": "Flexible and high performance search using Artifactory Query Language.",
+        "operationId": "postArtifactoryQueryLanguageAQL",
+        "security": [
+          {
+            "authenticated": []
+          },
+          {
+            "admin": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "items.find({\"repo\":{\"$eq\":\"libs-release-local\"}})"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "repo": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "string"
+                          },
+                          "created": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "created_by": {
+                            "type": "string"
+                          },
+                          "modified": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "modified_by": {
+                            "type": "string"
+                          },
+                          "updated": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    },
+                    "range": {
+                      "type": "object",
+                      "properties": {
+                        "start_pos": {
+                          "type": "integer"
+                        },
+                        "end_pos": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "limit": {
+                          "type": "integer"
+                        },
+                        "notification": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "results": [
+                      {
+                        "repo": "libs-release-local",
+                        "path": "org/jfrog/artifactory",
+                        "name": "artifactory.war",
+                        "type": "item type",
+                        "size": "75500000",
+                        "created": "2015-01-01T10:10:10",
+                        "created_by": "Jfrog",
+                        "modified": "2015-01-01T10:10:10",
+                        "modified_by": "Jfrog",
+                        "updated": "2015-01-01T10:10:10"
+                      }
+                    ],
+                    "range": {
+                      "start_pos": 0,
+                      "end_pos": 1,
+                      "total": 1,
+                      "limit": 5,
+                      "notification": "AQL query reached the search hard limit, results are trimmed."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/search/artifact": {
+      "get": {
+        "description": "Artifact search by part of file name. Searches return file info URIs. Can limit search to specific repositories (local or caches). Note: The search must be performed on the actual source repository (local or remote). Virtual repositories are not supported.",
+        "operationId": "artifactSearchQuickSearch",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "description": "Part of the artifact file name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "required": false,
+            "description": "Comma separated list of repository keys",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Result-Detail",
+            "in": "header",
+            "required": false,
+            "description": "Detail level of the search result (info, properties, both)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful search",
+            "content": {
+              "application/json": {
+                "example": {
+                  "results": [
+                    {
+                      "uri": "/artifactory/api/storage/libs-release-local/org/acme/lib/ver/lib-ver.pom"
+                    },
+                    {
+                      "uri": "/artifactory/api/storage/libs-release-local/org/acme/lib/ver2/lib-ver2.pom"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "tags": []
+      }
+    },
+    "/artifactory/api/search/gavc": {
+      "get": {
+        "description": "Search by Maven coordinates: GroupId, ArtifactId, Version & Classifier. The search must contain at least one argument. The search can be limited to specific repositories (local and remote-cache).",
+        "parameters": [
+          {
+            "name": "g",
+            "in": "query",
+            "description": "GroupId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "a",
+            "in": "query",
+            "description": "ArtifactId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "description": "Version",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "c",
+            "in": "query",
+            "description": "Classifier",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "description": "Comma-separated list of repositories to search within",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "specific",
+            "in": "query",
+            "description": "Whether to limit the search to specific repositories",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "X-Result-Detail",
+            "in": "header",
+            "description": "To add all extra information of the found artifact",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "info",
+                "properties",
+                "info, properties"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "results": [
+                    {
+                      "uri": "/artifactory/api/storage/libs-release-local/org/acme/artifact/1.0/artifact-1.0-sources.jar"
+                    },
+                    {
+                      "uri": "/artifactory/api/storage/libs-release-local/org/acme/artifactB/1.0/artifactB-1.0-sources.jar"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [],
+        "operationId": "getArtifactoryApiSearchGavc"
+      }
+    },
+    "/artifactory/api/search/prop": {
+      "get": {
+        "description": "Search by properties. If no value is specified for a property - assume '*'. Can limit search to specific repositories (local, remote-cache or virtual).",
+        "operationId": "propertySearch",
+        "security": [
+          {
+            "privilegedUser": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "p1",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "p2",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "application/json (application/vnd.org.jfrog.artifactory.search.MetadataSearchResult+json)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifactory/api/search/dependency": {
+      "get": {
+        "description": "Find all the builds an artifact is a dependency of (where the artifact is included in the build-info dependencies) Requires Artifactory Pro",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sha1",
+            "in": "query",
+            "required": true,
+            "description": "sha1Checksum",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "results": [
+                    {
+                      "uri": "/artifactory/api/build/my-build/50"
+                    },
+                    {
+                      "uri": "/artifactory/api/build/my-build/51"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [],
+        "operationId": "getArtifactoryApiSearchDependency"
+      }
+    },
+    "/api/search/buildArtifacts": {
+      "post": {
+        "description": "Find all the artifacts related to a specific build. Requires Artifactory Pro",
+        "security": [
+          {
+            "type": [],
+            "canBeAnonymous": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "buildName": {
+                    "type": "string"
+                  },
+                  "buildNumber": {
+                    "type": "string"
+                  },
+                  "buildStatus": {
+                    "type": "string"
+                  },
+                  "repos": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "mappings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "input": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "buildName": "build-name",
+                "buildNumber": "15",
+                "buildStatus": "Released",
+                "repos": [
+                  "libs-release-local",
+                  "ext-release-local"
+                ],
+                "mappings": [
+                  {
+                    "input": "(.+)-sources.jar"
+                  },
+                  {
+                    "input": "(.+)-javadoc.jar"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "application/json (application/vnd.org.jfrog.artifactory.search.BuildArtifactsSearchResult+json)",
+            "content": {
+              "application/json": {
+                "example": {
+                  "results": [
+                    {
+                      "downloadUri": "/artifactory/libs-release-local/org/acme/lib/ver/lib-sources.jar"
+                    },
+                    {
+                      "downloadUri": "/artifactory/ext-release-local/org/acme/lib/ver/lib-ver-javadoc.jar"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [],
+        "operationId": "postApiSearchBuildartifacts"
+      }
+    },
+    "/artifactory/api/v2/{repository-name}/parentManifests": {
+      "post": {
+        "tags": [],
+        "summary": "Find Parent Manifest Lists",
+        "description": "Finds all parent manifest lists that include a specific Docker manifest.",
+        "operationId": "findParentManifestLists",
+        "parameters": [
+          {
+            "name": "repository-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The repository name"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dockerRepository": {
+                    "type": "string",
+                    "example": "library/busybox"
+                  },
+                  "tag": {
+                    "type": "string",
+                    "example": "v1.0.0"
+                  }
+                },
+                "required": [
+                  "dockerRepository",
+                  "tag"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "parentManifestLists": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dockerRepository": {
+                            "type": "string",
+                            "example": "alpine"
+                          },
+                          "digest": {
+                            "type": "string",
+                            "example": "sha256:8a1f59ffb675680d47db6337b49d22281a139e9d709335b492be023728e11715"
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "example": "v1"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "readPermission": []
+          }
+        ]
+      }
+    },
+    "/artifactory/api/search/creation": {
+      "get": {
+        "summary": "Artifacts Created in Date Range",
+        "description": "Get All Artifacts Created in Date Range. If 'to' is not specified use now(). Can limit search to specific repositories (local or remote-cache).",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "description": "Start time in javaEpochMillis",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "End time in javaEpochMillis. If not specified, use now()",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "repos",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of repository keys (local or remote-cache)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string"
+                          },
+                          "created": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "operationId": "ArtifactsCreatedinDateRange"
+      }
+    }
+  },
+  "tags": []
+}
