@@ -9,4 +9,7 @@ You can create an application in AppTrust using one of the following methods:
 
 * CLI
 * REST API
-* Platform UI
+* [Create an Application in the Platform UI](doc:create-an-application-in-the-platform-ui)
+* <br />
+
+<br />
