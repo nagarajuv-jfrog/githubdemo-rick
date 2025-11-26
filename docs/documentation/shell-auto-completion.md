@@ -1,8 +1,8 @@
 ---
 title: Shell Auto Completion
 excerpt: >-
-  Generate shell completion scripts for JFrog CLI commands, including bash, zsh,
-  and fish.
+  Generate shell completion scripts for JFrog CLI , including bash, zsh, and
+  fish.
 deprecated: false
 hidden: false
 link:
