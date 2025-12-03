@@ -2,6 +2,7 @@
 title: Configuring Artifactory
 deprecated: false
 hidden: false
+icon: ⚙️
 metadata:
   robots: index
 ---
