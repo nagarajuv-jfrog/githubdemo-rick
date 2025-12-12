@@ -7,5 +7,9 @@ metadata:
 ---
 this is a test topic 2
 
+<Glossary>test_glos</Glossary>
+
 <br />
 
+
+<Test_reuse_2 />
