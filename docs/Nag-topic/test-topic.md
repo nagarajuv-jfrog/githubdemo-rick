@@ -1,5 +1,5 @@
 ---
-title: test topic
+title: Test Topic
 deprecated: false
 hidden: false
 metadata:
