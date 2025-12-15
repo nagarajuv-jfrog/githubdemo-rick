@@ -10,7 +10,7 @@ link:
 metadata:
   robots: index
 ---
-## JFrog Completion
+## JFrog Completion 
 
 Generate shell completion scripts for JFrog CLI commands.
 
