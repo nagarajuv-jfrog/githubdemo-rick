@@ -9,12 +9,17 @@ this is a test subtopic
 
 <br />
 
-<br />
+* [Test subtopic](doc:test-subtopic)]
+* \bold\ 
+* test
+* <br />
+*
+* <br />
 
 test
 
-<veera />
-
-<test_resusable />
+<br />
 
 <Veera />
+
+<br />
