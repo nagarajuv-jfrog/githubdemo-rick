@@ -10,6 +10,8 @@ metadata:
 ---
 This procedure assumes that your package manager client is connected to Artifactory. For configuration instructions, see Connect pub Client to Artifactory. Test test
 
+This is an edit I made in the branch.
+
 # To deploy pub packages to Artifactory:
 
 1. Update the version number in your `pubspec.yaml` file.
