@@ -35,7 +35,7 @@ This is an edit I made in the branch.
 
 <Cards>
   <Card title="Getting Started" href="#" icon="fa-rocket">
-    New to our platform? Follow this guide to get started.
+    New to our platform? [Follow this guide to get started](/docs/this-is-a-topic).
   </Card>
 
   <Card title="API Reference" href="#" icon="fa-code">
