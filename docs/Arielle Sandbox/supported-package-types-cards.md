@@ -8,9 +8,9 @@ metadata:
 The JFrog Platform supports the following package managers, clients, and tools, with new formats added regularly.
 
 <Cards>
-  <Card title="Alpine Linux" href="#this-is-a-topic" icon="fa-rocket" />
-
+  <Card title="Alpine Linux" href="#this-is-a-topic" icon="fa-rocket">
   Manage packages with apk
+	</Card>
 
   <Card title="Ansible" href="#" icon="fa-code">
     Publish and install collections and roles
