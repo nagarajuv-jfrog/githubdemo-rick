@@ -5,10 +5,10 @@ hidden: false
 metadata:
   robots: index
 ---
-The JFrog Platform supports the following package managers, clients, and tools, with new formats added regularly. 
+The JFrog Platform supports the following package managers, clients, and tools, with new formats added regularly.
 
 <Cards>
-  <Card title="[Alpine Linux[(/docs/this-is-a-topic)" href="#" icon="fa-rocket">
+  <Card title="[Alpine Linux](/docs/this-is-a-topic)" href="#" icon="fa-rocket">
     New to our platform? Follow this guide to get started.
   </Card>
 
