@@ -8,8 +8,7 @@ metadata:
 The JFrog Platform supports the following package managers, clients, and tools, with new formats added regularly.
 
 <Cards>
-  <Card title="[Alpine Linux](/docs/this-is-a-topic)" href="#" icon="fa-rocket">
-    New to our platform? Follow this guide to get started.
+  <Card title="Alpine Linux" href="#this-is-a-topic" icon="fa-rocket">
   </Card>
 
   <Card title="API Reference" href="#" icon="fa-code">
